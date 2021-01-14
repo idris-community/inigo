@@ -3,7 +3,7 @@ package="Extra"
 version="0.0.3"
 
 description="Miscellaneous Extra Functions and Helpers for Idris2"
-link="https://github.com/inigo/tree/master/Base/Extra"
+link="https://github.com/idris-community/inigo/tree/master/Base/Extra"
 readme="README.md"
 modules=["Extra.Buffer", "Extra.Debug", "Extra.Either", "Extra.List", "Extra.Monad", "Extra.Op", "Extra.String"]
 depends=["idris2", "contrib"]

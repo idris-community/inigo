@@ -3,7 +3,7 @@ package="Fmt"
 version="0.0.1"
 
 description="Dependently-typed String Formatter for Idris2"
-link="https://github.com/inigo/tree/master/Base/Fmt"
+link="https://github.com/idris-community/inigo/tree/master/Base/Fmt"
 readme="README.md"
 modules=["Fmt"]
 depends=["idris2", "contrib"]
