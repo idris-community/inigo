@@ -7,11 +7,11 @@ import Inigo.Async.Promise
 import Inigo.Async.Util
 
 -- Compresses a String using Brotli, returning a Buffer
-%foreign (promisifyPrimReq "zlib,util" "(datum)=>{return __require_util.promisify(__require_zlib.brotliCompress)(datum)}")
+%foreign (promisifyPrim "(datum)=>{return require('util').promisify(require('zlib').brotliCompress)(datum)}")
 brotli_compress__prim : Buffer -> promise Buffer
 
 -- Decompresses a buffer encoded in Brotli, returning the original data
-%foreign (promisifyPrimReq "zlib,util" "(buf)=>__require_util.promisify(__require_zlib.brotliDecompress)(buf)")
+%foreign (promisifyPrim "(buf)=>require('util').promisify(require('zlib').brotliDecompress)(buf)")
 brotli_decompress__prim : Buffer -> promise Buffer
 
 export

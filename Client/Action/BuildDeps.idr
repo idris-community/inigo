@@ -6,7 +6,6 @@ import Fmt
 import Inigo.Async.Base
 import Inigo.Async.FS
 import Inigo.Async.Promise
-import Inigo.Util.Path.Path
 
 depsDir : String
 depsDir = "./Deps"

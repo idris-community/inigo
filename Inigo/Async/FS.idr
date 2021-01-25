@@ -4,28 +4,28 @@ import Inigo.Async.Promise
 import Inigo.Async.Util
 import Data.Buffer
 import Extra.Buffer
-import Inigo.Util.Path.Path
+import System.Path
 
-%foreign (promisifyPrimReq "fs" "(path)=>__require_fs.promises.readFile(path,'utf8')")
+%foreign (promisifyPrim "(path)=>require('fs').promises.readFile(path,'utf8')")
 fs_readFile__prim : String -> promise String
 
-%foreign (promisifyPrimReq "fs" "(path)=>__require_fs.promises.readFile(path)")
+%foreign (promisifyPrim "(path)=>require('fs').promises.readFile(path)")
 fs_readFileBuf__prim : String -> promise Buffer
 
-%foreign (promisifyPrimReq "fs" "(path,contents)=>__require_fs.promises.writeFile(path,contents)")
+%foreign (promisifyPrim "(path,contents)=>require('fs').promises.writeFile(path,contents)")
 fs_writeFile__prim : String -> String -> promise ()
 
-%foreign (promisifyPrimReq "fs" "(path,contents)=>__require_fs.promises.writeFile(path,contents)")
+%foreign (promisifyPrim "(path,contents)=>require('fs').promises.writeFile(path,contents)")
 fs_writeFileBuf__prim : String -> Buffer -> promise ()
 
-%foreign (promisifyPrimReq "fs" "(path,r)=>__require_fs.promises.mkdir(path,{recursive: r == 0n})")
+%foreign (promisifyPrim "(path,r)=>require('fs').promises.mkdir(path,{recursive: r == 0n})")
 fs_mkdir__prim : String -> Bool -> promise ()
 
-%foreign (promisifyPrimReq "fs" "(path)=>__require_fs.promises.readdir(path).then(__prim_js2idris_array)")
+%foreign (promisifyPrim "(path)=>require('fs').promises.readdir(path).then(__prim_js2idris_array)")
 fs_getFiles__prim : String -> promise (List String)
 
 -- TODO: Include more stat?
-%foreign (promisifyPrimReq "fs" "(path)=>__require_fs.promises.stat(path).then((s)=>s.isDirectory() ? 0n : 1n)")
+%foreign (promisifyPrim "(path)=>require('fs').promises.stat(path).then((s)=>s.isDirectory() ? 0n : 1n)")
 fs_stat__prim : String -> promise Bool
 
 export
@@ -75,7 +75,7 @@ fs_getFilesR path =
       if isDir
         then do
           entries <- fs_getFiles path
-          let fullEntries = map (joinPath path) entries
+          let fullEntries = map (path </>) entries
           allFiles <- all (map doGetFilesR fullEntries)
           pure (concat allFiles)
         else

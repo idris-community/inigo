@@ -31,20 +31,20 @@ combineText : List MarkdownToken -> List MarkdownToken
 combineText [] = []
 combineText (el :: rest) =
   let
-    init = (the (List1 MarkdownToken, MarkdownToken) ([el], el))
+    init = (List1.singleton el, el)
   in
-    toList $ reverse $ fst $ (foldl accumulate init rest)
+    forget $ reverse $ fst $ (foldl accumulate init rest)
   where
     accumulate : (List1 MarkdownToken, MarkdownToken) -> MarkdownToken -> (List1 MarkdownToken, MarkdownToken)
-    accumulate (acc0 :: acc1, last) el =
+    accumulate (acc0 ::: acc1, last) el =
       case (last, el) of
         (Tok MdText a, Tok MdText b) =>
           let
             combined = Tok MdText (a ++ b)
           in
-          (combined :: acc1, combined)
+          (combined ::: acc1, combined)
         _ =>
-          (el :: acc0 :: acc1, el)
+          (el ::: acc0 :: acc1, el)
 
 public export
 lexMarkdown : String -> Maybe (List MarkdownToken)

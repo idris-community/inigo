@@ -12,7 +12,7 @@ reject__prim : String -> promise a
 %foreign (promisifyResolve "null" "(text)=>console.log(text)")
 log__prim : String -> promise ()
 
-%foreign (promisifyPrimReq "child_process" (toArray "(cmd,args,detached,verbose)=>new Promise((resolve,reject)=>{let opts={detached:detached===0n, stdio: ['ignore', process.stdout, process.stderr]};__require_child_process.spawn(cmd, toArray(args), opts).on('close', (code) => resolve(code))})"))
+%foreign (promisifyPrim (toArray "(cmd,args,detached,verbose)=>new Promise((resolve,reject)=>{let opts={detached:detached===0n, stdio: ['ignore', process.stdout, process.stderr]};require('child_process').spawn(cmd, toArray(args), opts).on('close', (code) => resolve(code))})"))
 system__prim : String -> List String -> Bool -> Bool -> promise Int
 
 export

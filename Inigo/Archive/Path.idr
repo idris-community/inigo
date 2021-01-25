@@ -4,7 +4,7 @@ import Data.List
 import Data.Strings
 import Extra.String
 import Inigo.Package.Package
-import Inigo.Util.Path.Path
+import System.Path
 
 isIPkg : String -> Bool
 isIPkg =
@@ -31,6 +31,6 @@ export
 depPath : Package -> String
 depPath pkg =
   let
-    modPath = pathUnsplit (split '.' (package pkg))
+    modPath = joinPath (split '.' (package pkg))
   in
-    joinPath "Deps" (joinPath (ns pkg) modPath)
+    "Deps" </> (ns pkg) </> modPath
