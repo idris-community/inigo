@@ -14,8 +14,8 @@ import Inigo.Async.Compress.Brotli
 import Inigo.Async.FS
 import Inigo.Async.Promise
 import Inigo.Package.Package
-import Inigo.Util.Path.Path
 import System
+import System.Path
 
 -- Simple archive format for storing files compressed in Toml files
 
@@ -42,9 +42,9 @@ buildArchive package rootPath =
     encodeFile file =
       do
         res <- compressFileEnc64 file
-        let relPath = relativeTo rootPath file
+        let relPath = fromMaybe "" $ Path.dropBase rootPath file
         log (fmt "Archiving %s..." relPath)
-        pure (pathSplit relPath, res)
+        pure (splitPath relPath, res)
 
 export
 saveArchive : Package -> String -> String -> Promise ()
@@ -57,12 +57,13 @@ saveArchive package rootPath outFile =
 decompressFile : String -> (List String, String) -> Promise ()
 decompressFile outPath (filename, compressed) =
   do
-    let resultFile = joinPath outPath (pathUnsplit filename)
+    let resultFile = outPath </> (joinPath filename)
     buffer <- liftIO $ dec64 compressed
     res <- decompress buffer
     log ("Decompressing " ++ resultFile ++ "...")
     pure ()
-    fs_mkdir True (parent resultFile)
+    let resultDir = fromMaybe "" $ parent resultFile
+    fs_mkdir True resultDir
     fs_writeFileBuf resultFile res
 
 expect : String -> Maybe a -> Promise a

@@ -45,7 +45,7 @@ listOp op =
 export
 split : Char -> String -> List String
 split c =
-  ( map pack ) . Data.List1.toList . (Data.List.split (== c)) . unpack
+  ( map pack ) . Data.List1.forget . (Data.List.split (== c)) . unpack
 
 export
 includesAny : String -> String -> Bool

@@ -11,8 +11,8 @@ import Inigo.Async.Fetch
 import Inigo.Async.FS
 import Inigo.Async.Promise
 import Inigo.Package.Package
-import Inigo.Util.Path.Path
 import Inigo.Util.Url.Url
+import System.Path
 import SemVar
 
 getPath : String -> String -> (Maybe Version) -> String
@@ -46,6 +46,6 @@ pull server packageNS packageName maybeVersion =
     archive <- getArchive server pkg
     let depPath = Archive.Path.depPath pkg
     extractArchive archive depPath
-    let iPkgFile = joinPath depPath "Inigo.ipkg"
+    let iPkgFile = depPath </> "Inigo.ipkg"
     log (fmt "Writing %s..." iPkgFile)
     fs_writeFile iPkgFile (Package.Package.generateIPkg True pkg)

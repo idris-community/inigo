@@ -5,9 +5,9 @@ import Extra.Buffer
 import Fmt
 import Inigo.Async.Base
 import Inigo.Async.Promise
-import Inigo.Util.Path.Path
 import System
 import System.File
+import System.Path
 
 rejectStatus : String -> Int -> Buffer -> Promise a
 rejectStatus url status buf =

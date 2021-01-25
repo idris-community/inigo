@@ -1,5 +1,6 @@
 module Client.Action.Push
 
+import Data.Maybe
 import Client.Server
 import Client.Util
 import Data.Buffer
@@ -10,9 +11,9 @@ import Inigo.Async.FS
 import Inigo.Async.Promise
 import Inigo.Package.Package
 import Inigo.Async.Package
-import Inigo.Util.Path.Path
 import Inigo.Util.Url.Url
 import Toml
+import System.Path
 
 pushArchive : Server -> String -> Package -> String -> Promise ()
 pushArchive server session pkg rootPath =
@@ -48,7 +49,7 @@ push : Server -> String -> String -> Promise ()
 push server session packageFile =
   do
     pkg <- readPackage packageFile
-    let rootPath = parent packageFile    
+    let rootPath = fromMaybe "" $ parent packageFile    
     pushArchive server session pkg rootPath
-    maybePushReadme server session (map (joinPath rootPath) (readme pkg)) pkg
+    maybePushReadme server session (map (rootPath </>) (readme pkg)) pkg
     pushPackage server session pkg

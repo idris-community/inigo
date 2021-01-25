@@ -6,13 +6,13 @@ import Inigo.Async.Base
 import Inigo.Async.Promise
 import Inigo.Async.Util
 
-%foreign (promisifyPrimReq "http,https" "(url)=>new Promise((resolve,reject)=>(url.startsWith('https')?__require_https:__require_http).get(url,(r)=>{let d='';r.on('data',(c)=>{d+=c;});r.on('end',()=>{resolve(d)});}).on('error',(e)=>{reject(e);}))")
+%foreign (promisifyPrim "(url)=>new Promise((resolve,reject)=>(url.startsWith('https')?require('https'):require('http')).get(url,(r)=>{let d='';r.on('data',(c)=>{d+=c;});r.on('end',()=>{resolve(d)});}).on('error',(e)=>{reject(e);}))")
 fetch__prim : String -> promise String
 
-%foreign (promisifyPrimReq "http,https" "(url)=>new Promise((resolve,reject)=>(url.startsWith('https')?__require_https:__require_http).get(url,(r)=>{let cs=[];r.on('data',(c)=>{cs.push(Buffer.from(c))});r.on('end',()=>{resolve(Buffer.concat(cs))});}).on('error',(e)=>{reject(e);}))")
+%foreign (promisifyPrim "(url)=>new Promise((resolve,reject)=>(url.startsWith('https')?require('https'):require('http')).get(url,(r)=>{let cs=[];r.on('data',(c)=>{cs.push(Buffer.from(c))});r.on('end',()=>{resolve(Buffer.concat(cs))});}).on('error',(e)=>{reject(e);}))")
 fetchBuf__prim : String -> promise Buffer
 
-%foreign (promisifyPrimReq "http,https" ("(url,method,data,headers)=>new Promise((resolve,reject)=>{"++ toObject ++";let u=new URL(url);let port=u.port!==''?u.port:u.protocol==='https:'?443:80;let opts={hostname:u.hostname,port,path:u.pathname,method,headers:toObject(headers)};let req=(u.protocol==='https:'?__require_https:__require_http).request(opts,(r)=>{let cs=[];r.on('data',(c)=>{cs.push(Buffer.from(c))});r.on('end',()=>{resolve(__prim_js2idris_array([Buffer.from(r.statusCode.toString(), 'utf-8'), Buffer.concat(cs)]))});}).on('error',(e)=>reject(e));req.on('error',(e)=>reject(e));req.write(data);req.end();})"))
+%foreign (promisifyPrim ("(url,method,data,headers)=>new Promise((resolve,reject)=>{"++ toObject ++";let u=new URL(url);let port=u.port!==''?u.port:u.protocol==='https:'?443:80;let opts={hostname:u.hostname,port,path:u.pathname,method,headers:toObject(headers)};let req=(u.protocol==='https:'?require('https'):require('http')).request(opts,(r)=>{let cs=[];r.on('data',(c)=>{cs.push(Buffer.from(c))});r.on('end',()=>{resolve(__prim_js2idris_array([Buffer.from(r.statusCode.toString(), 'utf-8'), Buffer.concat(cs)]))});}).on('error',(e)=>reject(e));req.on('error',(e)=>reject(e));req.write(data);req.end();})"))
 request__prim : String -> String -> Buffer -> List (String, String) -> promise (List Buffer)
 
 export

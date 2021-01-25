@@ -6,7 +6,6 @@ import Inigo.Async.Base
 import Inigo.Async.Promise
 import Inigo.Package.CodeGen as CodeGen
 import Inigo.Package.Package
-import Inigo.Util.Path.Path
 
 -- TODO: Consider moving this out from Inigo into toml config
 export

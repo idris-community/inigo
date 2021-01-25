@@ -7,7 +7,7 @@ import Inigo.Async.Package
 import Inigo.Async.Promise
 import Inigo.Package.CodeGen as CodeGen
 import Inigo.Package.Package
-import Inigo.Util.Path.Path
+import System.Path
 
 execDir : String
 execDir =
@@ -22,7 +22,7 @@ exec codeGen build userArgs =
     if build then (runBuild codeGen pkg) else pure ()
     Just e <- lift $ executable pkg
       | Nothing => reject "No executable set in Inigo config"
-    let (cmd, args) = CodeGen.cmdArgs codeGen (joinPath execDir e)
+    let (cmd, args) = CodeGen.cmdArgs codeGen (execDir </> e)
     log (fmt "Executing %s with args %s..." e (show userArgs))
     system cmd (args ++ userArgs) True True
     pure ()

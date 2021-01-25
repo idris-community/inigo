@@ -14,11 +14,6 @@ promisifyPrim_ str =
   "(...args)=>{let [w,err,ok,...fargs]=args.reverse();return (" ++ str ++ ")(...fargs.reverse()).then((x)=>ok(x)(w),(e)=>err(e)(w))}"
 
 public export
-promisifyPrimReq : String -> String -> String
-promisifyPrimReq reqs str =
-  "node:lambdaRequire:" ++ reqs ++ ":" ++ (promisifyPrim_ str)
-
-public export
 promisifyPrim: String -> String
 promisifyPrim str =
   "node:lambda:" ++ (promisifyPrim_ str)
