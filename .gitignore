@@ -7,7 +7,5 @@ Server/InigoStatic/Local/*
 .terraform
 *.tfstate
 *.tfstate.backup
-*.ipkg
 !*Bootstrap.ipkg
-!./Inigo.ipkg
 !./Server/InigoServer/InigoServer.ipkg
