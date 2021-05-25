@@ -3,7 +3,7 @@ module Inigo.Async.Archive
 import Data.Buffer
 import Data.List
 import Data.Maybe
-import Data.Strings
+import Data.String
 import Extra.Buffer
 import Extra.String
 import Fmt

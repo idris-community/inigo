@@ -16,7 +16,7 @@ import Client.Skeleton.Skeleton
 import Client.Util
 import Data.List
 import Data.Maybe
-import Data.Strings
+import Data.String
 import Extra.Either
 import Extra.String
 import Fmt

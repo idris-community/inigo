@@ -1,7 +1,7 @@
 module Client.Action.BuildDeps
 
 import Data.List
-import Data.Strings
+import Data.String
 import Fmt
 import Inigo.Async.Base
 import Inigo.Async.FS

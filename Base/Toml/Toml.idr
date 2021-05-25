@@ -1,7 +1,7 @@
 module Toml
 
 import Data.List
-import Data.Strings
+import Data.String
 import Extra.String
 import Toml.Parser
 import Toml.Lexer
