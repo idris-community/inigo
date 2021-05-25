@@ -27,7 +27,7 @@ readPackage : String -> Promise Package
 readPackage packageFile =
   do
     contents <- fs_readFile packageFile
-    Right package <- lift $ parsePackage contents
+    let Right package = parsePackage contents
       | Left err => reject ("Error reading package: " ++ err)
     pure package
 
@@ -36,6 +36,6 @@ currPackage : Promise Package
 currPackage =
   do
     contents <- fs_readFile currConfFile
-    Right package <- lift $ parsePackage contents
+    let Right package = parsePackage contents
       | Left err => reject ("Error reading package: " ++ err)
     pure package

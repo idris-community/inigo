@@ -20,7 +20,7 @@ exec codeGen build userArgs =
   do
     pkg <- Client.Action.Build.writeIPkgFile
     if build then (runBuild codeGen pkg) else pure ()
-    Just e <- lift $ executable pkg
+    let Just e = executable pkg
       | Nothing => reject "No executable set in Inigo config"
     let (cmd, args) = CodeGen.cmdArgs codeGen (execDir </> e)
     log (fmt "Executing %s with args %s..." e (show userArgs))

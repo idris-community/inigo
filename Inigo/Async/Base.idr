@@ -40,6 +40,6 @@ export
 liftEither : Either String a -> Promise a
 liftEither x =
   do
-    Right res <- lift x
+    let Right res = x
       | Left err => reject err
     pure res
