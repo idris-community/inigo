@@ -40,12 +40,11 @@ examplePackage =
 examplePackageTest : Test
 examplePackageTest =
   test "Parse Example Package" (\_ => assertEq
-    (parsePackage
-      "
+    (parsePackage """
       ns='Example'
       package='Inigo'
       version='0.0.1-pre'
-
+      
       description='My Description'
       readme='README.md'
       link='http://example.com'
@@ -54,13 +53,13 @@ examplePackageTest =
       license='MIT'
       main='MyFile'
       executable='MyExec'
-
+      
       [deps]
       MyDep='^1.2.3'
-
+      
       [dev-deps]
       MyDevDep='2.0.0'
-      "
+      """
     )
     (Right examplePackage)
   )
@@ -69,11 +68,11 @@ invalidVersionTest : Test
 invalidVersionTest =
   test "Invalid version test" (\_ => assertEq
     (parsePackage
-      "
+      """
       ns='Example'
       package='Inigo'
       version='0.0.1zz'
-      "
+      """
     )
     (
       Left "Invalid version: 0.0.1zz"
@@ -111,19 +110,21 @@ encodePackageTest =
         ]
     )
     (
-      "ns=\"Example\"
-package=\"Inigo\"
-version=\"0.0.1-pre\"
-description=\"My Description\"
-link=\"http://example.com\"
-readme=\"README.md\"
-modules=[\"MyDir\"]
-depends=[\"idris2\"]
-license=\"MIT\"
-main=\"MyFile\"
-executable=\"MyExec\"
-deps.MyDep=\">=1.2.3 <2.0.0\"
-dev-deps.MyDevDep=\"=2.0.0\""
+      """
+      ns=\"Example\"
+      package=\"Inigo\"
+      version=\"0.0.1-pre\"
+      description=\"My Description\"
+      link=\"http://example.com\"
+      readme=\"README.md\"
+      modules=[\"MyDir\"]
+      depends=[\"idris2\"]
+      license=\"MIT\"
+      main=\"MyFile\"
+      executable=\"MyExec\"
+      deps.MyDep=\">=1.2.3 <2.0.0\"
+      dev-deps.MyDevDep=\"=2.0.0\"
+      """
     )
   )
 
@@ -153,17 +154,18 @@ generateIPkgTest =
         []
     )
     (
-      "package Inigo
+      """
+      package Inigo
 
-modules = MyDir
-depends = idris2
+      modules = MyDir
+      depends = idris2
 
-sourcedir = \"Deps/Example/Inigo\"
+      sourcedir = \"Deps/Example/Inigo\"
 
-version = \"0.0.1-pre\"
-main = MyFile
-executable = MyExec
-"
+      version = \"0.0.1-pre\"
+      main = MyFile
+      executable = MyExec
+      """
     )
   )
 
