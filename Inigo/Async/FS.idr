@@ -18,8 +18,8 @@ fs_writeFile__prim : String -> String -> promise ()
 %foreign (promisifyPrim "(path,contents)=>require('fs').promises.writeFile(path,contents)")
 fs_writeFileBuf__prim : String -> Buffer -> promise ()
 
-%foreign (promisifyPrim "(path,r)=>require('fs').promises.mkdir(path,{recursive: r == 0n})")
-fs_mkdir__prim : String -> Bool -> promise ()
+%foreign (promisifyPrim "(path,r)=>require('fs').promises.mkdir(path,{recursive: r == 1n})")
+fs_mkdir__prim : String -> Int -> promise ()
 
 %foreign (promisifyPrim "(path)=>require('fs').promises.readdir(path).then(__prim_js2idris_array)")
 fs_getFiles__prim : String -> promise (List String)
@@ -51,7 +51,7 @@ fs_writeFileBuf path contents =
 export
 fs_mkdir : Bool -> String -> Promise ()
 fs_mkdir recursive path =
-  promisify (fs_mkdir__prim path recursive)
+  promisify (fs_mkdir__prim path (if recursive then 1 else 0))
 
 export
 fs_getFiles : String -> Promise (List String)
