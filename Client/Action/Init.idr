@@ -17,7 +17,7 @@ init skeleton packageNS packageName =
   where
     ensureParent : String -> Promise ()
     ensureParent path = case parent path of
-                          Just parentPath => fs_mkdir True parentPath
+                          Just parentPath => unless (parentPath == "") $ fs_mkdir True parentPath
                           Nothing => pure ()
 
     writeTmplFile : (List String, String) -> Promise ()
