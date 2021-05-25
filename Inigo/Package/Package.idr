@@ -129,7 +129,8 @@ generateIPkg isDep pkg =
       then fmt "Deps/%s/%s" (ns pkg) (package pkg)
       else ""
   in
-    fmt "package %s
+    fmt """
+package %s
 
 modules = %s
 depends = %s
@@ -137,4 +138,4 @@ depends = %s
 sourcedir = %s
 
 version = \"%s\"%s%s
-" (package pkg) modules' depends' (quote sourceDir) (show $ version pkg) main executable
+""" (package pkg) modules' depends' (quote sourceDir) (show $ version pkg) main executable

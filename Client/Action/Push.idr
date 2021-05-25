@@ -20,22 +20,19 @@ pushArchive server session pkg rootPath =
   do
     contents <- Inigo.Async.Archive.buildArchive pkg rootPath
     let url = toString (fromHostPath (host server) (postArchiveUrl pkg))
-    assertOk url $ request url "POST" contents [auth session]
-    pure ()
+    ignore $ assertOk url $ request url "POST" contents [auth session]
 
 pushReadme : Server -> String -> Package -> String -> Promise ()
 pushReadme server session pkg contents =
   do
     let url = toString (fromHostPath (host server) (postReadmeUrl pkg))
-    assertOk url $ request url "POST" contents [auth session]
-    pure ()
+    ignore $ assertOk url $ request url "POST" contents [auth session]
 
 pushPackage : Server -> String -> Package -> Promise ()
 pushPackage server session pkg =
   do
     let url = toString (fromHostPath (host server) (postPackageUrl pkg))
-    assertOk url $ request url "POST" (encode $ toToml pkg) [auth session]
-    pure ()
+    ignore $ assertOk url $ request url "POST" (encode $ toToml pkg) [auth session]
 
 maybePushReadme : Server -> String -> Maybe String -> Package -> Promise ()
 maybePushReadme _ _ Nothing pkg = pure ()

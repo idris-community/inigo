@@ -13,8 +13,7 @@ registerAccountCall server ns email passphrase =
   do
     let contents = encode [(["email"], Str email), (["passphrase"], Str passphrase)]
     let url = toString (fromHostPath (host server) (accountPostUrl ns))
-    assertOk url $ request url "POST" contents []
-    pure ()
+    ignore $ assertOk url $ request url "POST" contents []
 
 export
 registerAccount : Server -> String -> String -> String -> Promise ()

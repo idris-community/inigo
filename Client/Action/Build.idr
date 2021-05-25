@@ -27,8 +27,7 @@ export
 runBuild : CodeGen -> Package -> Promise ()
 runBuild codeGen pkg =
   do
-    system "idris2" ["--build", iPkgFile, "--cg", toString codeGen] False True
-    pure ()
+    ignore $ system "idris2" ["--build", iPkgFile, "--cg", toString codeGen] False True
 
 export
 build : CodeGen -> Promise ()

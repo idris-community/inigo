@@ -76,5 +76,4 @@ extractArchive archive outPath =
   do
     contents <- liftIO (readAll archive)
     files <- expect "Failed to read archive" (Archive.decode contents)
-    all (map (decompressFile outPath) files)
-    pure ()
+    ignore $ all (map (decompressFile outPath) files)

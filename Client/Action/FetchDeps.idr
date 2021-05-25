@@ -68,8 +68,7 @@ fetchDeps server includeDevDeps build =
       | Left err => reject ("Error satisfying contraints: " ++ err)
     log ("Sat: " ++ (show sat))
     
-    all $ map pullDep sat
-    pure ()
+    ignore $ all $ map pullDep sat
     -- TODO: We should only build things which have changed
     -- TODO: How do we know what's changed?
     -- if build
@@ -85,4 +84,3 @@ fetchDeps server includeDevDeps build =
         Just (packageNS, packageName) =>
           do
             pull server packageNS packageName (Just version)
-            pure ()

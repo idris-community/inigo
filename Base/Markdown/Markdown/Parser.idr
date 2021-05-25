@@ -5,6 +5,7 @@ import Markdown.Data
 import Text.Parser
 import Text.Token
 import Data.List
+import Data.List1
 
 import public Markdown.Tokens
 
@@ -46,10 +47,10 @@ mutual
   wrapInline : MarkdownTokenKind -> (List Inline -> a) -> Grammar MarkdownToken True a
   wrapInline sym tok =
     do
-      match sym
+      ignore $ match sym
       contents <- some inline
-      match sym
-      pure $ tok contents
+      ignore $ match sym
+      pure $ tok (forget contents)
 
   private
   header : Grammar MarkdownToken True Block
@@ -77,7 +78,7 @@ mutual
     do
       contents <- some inline
       blockTerminal
-      pure $ Paragraph contents
+      pure $ Paragraph (forget contents)
 
   private
   text : Grammar MarkdownToken True Inline

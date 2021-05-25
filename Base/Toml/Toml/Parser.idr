@@ -1,6 +1,7 @@
 module Toml.Parser
 
 import Data.List
+import Data.List1
 import Extra.List
 import Text.Parser
 import Text.Token
@@ -19,7 +20,7 @@ whitespace =
 
 keyword : Grammar TomlToken True (List String)
 keyword =
-  sepBy1 (match Dot) (match Keyword <|> match StringLit <|> (map show $ match Number))
+  forget <$> sepBy1 (match Dot) (match Keyword <|> match StringLit <|> (map show $ match Number))
 
 heading : Grammar TomlToken True (List String)
 heading =
@@ -60,20 +61,20 @@ num =
 optSpacing : Grammar TomlToken True a -> Grammar TomlToken True a
 optSpacing inner =
   do
-    optional (match Whitespace)
+    ignore $ optional (match Whitespace)
     res <- inner
-    optional (match Whitespace)
+    ignore $ optional (match Whitespace)
     pure res
 
 mutual
   list : Grammar TomlToken True Value
   list =
     do
-      match LeftBracket
-      optional (match Whitespace)
+      ignore $ match LeftBracket
+      ignore $ optional (match Whitespace)
       values <- sepBy (optSpacing $ match Comma) value
-      optional (match Whitespace)
-      match RightBracket
+      ignore $ optional (match Whitespace)
+      ignore $ match RightBracket
       pure (Lst values)
 
   value : Grammar TomlToken True Value
@@ -95,13 +96,13 @@ mutual
       key <- doubleHeading
       -- Let's read a table and repeat with the same heading any number of times
       tomls <- sepBy1 (doubleHeadingOf key) (simpleToml key)
-      let val = ArrTab tomls
+      let val = ArrTab $ forget tomls
       pure [(key, val)]
 
   emptyHeading : Grammar TomlToken True (List (List String, Value))
   emptyHeading =
     do
-      heading
+      ignore heading
       pure []
 
   kvs : Grammar TomlToken True (List (List String, Value))
@@ -112,7 +113,7 @@ mutual
             kv
         <|> comment
         <|> whitespace)
-      pure $ map (\(k, v) => (key ++ k, v)) (mapMaybe id inner)
+      pure $ map (\(k, v) => (key ++ k, v)) (mapMaybe id $ forget inner)
 
   simpleToml : List String -> Grammar TomlToken False Toml
   simpleToml pre =

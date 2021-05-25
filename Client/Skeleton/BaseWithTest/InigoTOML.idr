@@ -8,7 +8,8 @@ name = const ["Inigo.toml"]
 
 export
 build : (String, String) -> String
-build (packageNS, packageName) = fmt "ns=\"%s\"
+build (packageNS, packageName) = fmt """
+ns=\"%s\"
 package=\"%s\"
 version=\"0.0.1\"
 
@@ -25,4 +26,4 @@ executable=\"%s\"
 
 [dev-deps]
 Base.IdrTest=\"~0.0.1\"
-" packageNS packageName packageName packageName packageName
+""" packageNS packageName packageName packageName packageName

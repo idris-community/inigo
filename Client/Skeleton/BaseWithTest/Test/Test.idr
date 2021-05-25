@@ -8,7 +8,8 @@ name (packageNS, packageName) = ["Test", packageName ++ "Test.idr"]
 
 export
 build : (String, String) -> String
-build (packageNS, packageName) = fmt "module Test.%sTest
+build (packageNS, packageName) = fmt """
+module Test.%sTest
 
 import IdrTest.Test
 import IdrTest.Expectation
@@ -21,4 +22,4 @@ suite =
   describe \"%s Tests\"
     [ test \"1 == 1\" (\\_ => assertEq 1 1 )
     ]
-" packageName packageName packageName
+""" packageName packageName packageName

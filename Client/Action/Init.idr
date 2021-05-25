@@ -12,7 +12,7 @@ export
 init : Skeleton -> String -> String -> Promise ()
 init skeleton packageNS packageName =
   do
-    all $ map writeTmplFile (getFiles skeleton (packageNS, packageName))
+    ignore $ all $ map writeTmplFile (getFiles skeleton (packageNS, packageName))
     log (fmt "Successfully built %s" (toString skeleton))
   where
     ensureParent : String -> Promise ()

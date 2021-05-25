@@ -8,9 +8,10 @@ name (packageNS, packageName) = [packageName ++ ".idr"]
 
 export
 build : (String, String) -> String
-build (packageNS, packageName) = fmt "module %s
+build (packageNS, packageName) = fmt """
+module %s
 
 main : IO ()
 main =
   putStrLn \"Hello from %s.%s\"
-" packageName packageNS packageName
+""" packageName packageNS packageName

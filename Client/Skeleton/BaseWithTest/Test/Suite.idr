@@ -8,7 +8,8 @@ name = const ["Test", "Suite.idr"]
 
 export
 build : (String, String) -> String
-build (packageNS, packageName) = fmt "module Test.Suite
+build (packageNS, packageName) = fmt """
+module Test.Suite
 
 import IdrTest.Test
 
@@ -19,4 +20,4 @@ suite = do
   runSuites
     [ Test.%sTest.suite
     ]
-" packageName packageName
+""" packageName packageName
