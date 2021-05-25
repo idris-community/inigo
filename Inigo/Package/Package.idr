@@ -137,5 +137,5 @@ depends = %s
 
 sourcedir = %s
 
-version = \"%s\"%s%s
+version = %s%s%s
 """ (package pkg) modules' depends' (quote sourceDir) (show $ version pkg) main executable
