@@ -1,6 +1,6 @@
 module Fmt
 
-import Data.Strings
+import Data.String
 
 %default total
 
