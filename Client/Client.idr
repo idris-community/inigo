@@ -80,7 +80,7 @@ getAction ["build-deps"] =
 
 getAction ["build", codeGen] =
   do
-    codeGen <- getCodeGen codeGen
+    let codeGen = getCodeGen codeGen
     pure $ Build codeGen
 
 getAction ["build"] =
@@ -114,7 +114,7 @@ getAction ["pull", serverName, packageNS, packageName, versionStr] =
 
 getAction ["test", codeGen] =
   do
-    codeGen <- getCodeGen codeGen
+    let codeGen = getCodeGen codeGen
     pure $ Test codeGen
 
 getAction ["test"] =
