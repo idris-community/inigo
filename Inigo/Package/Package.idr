@@ -116,6 +116,10 @@ export
 encodePackage : Package -> String
 encodePackage = encode . toToml
 
+whenCons : Monoid a => List b -> a -> a
+whenCons [] _ = neutral
+whenCons _ x = x
+
 -- ||| Generates an ipkg for compatibility with the native idris build system
 export
 generateIPkg : Bool -> Package -> String
@@ -123,8 +127,8 @@ generateIPkg isDep pkg =
   let
     main = fromMaybe "" $ map ((++) "\nmain = ") (main pkg)
     executable = fromMaybe "" $ map ((++) "\nexecutable = ") (executable pkg)
-    modules' = join ", " (modules pkg)
-    depends' = join ", " (depends pkg)
+    modules' = whenCons pkg.modules $ fmt "modules = %s " $ join ", " (modules pkg)
+    depends' = whenCons pkg.depends $ fmt "depends = %s " $ join ", " (depends pkg)
     sourceDir = if isDep
       then fmt "Deps/%s/%s" (ns pkg) (package pkg)
       else ""
@@ -132,8 +136,8 @@ generateIPkg isDep pkg =
     fmt """
 package %s
 
-modules = %s
-depends = %s
+%s
+%s
 
 sourcedir = %s
 

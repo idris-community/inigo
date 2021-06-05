@@ -18,6 +18,9 @@ whitespace : Grammar TomlToken True (Maybe (List String, Value))
 whitespace =
   map (const Nothing) (match Whitespace)
 
+optWhitespace : Grammar TomlToken False ()
+optWhitespace = ignore $ optional $ match Whitespace
+
 keyword : Grammar TomlToken True (List String)
 keyword =
   forget <$> sepBy1 (match Dot) (match Keyword <|> match StringLit <|> (map show $ match Number))
@@ -26,7 +29,9 @@ heading : Grammar TomlToken True (List String)
 heading =
   do
     match LeftBracket
+    optWhitespace
     key <- keyword
+    optWhitespace
     match RightBracket
     pure key
 
@@ -36,7 +41,9 @@ doubleHeading =
   do
     match LeftBracket
     match LeftBracket
+    optWhitespace
     key <- keyword
+    optWhitespace
     match RightBracket
     match RightBracket
     pure key
@@ -61,9 +68,9 @@ num =
 optSpacing : Grammar TomlToken True a -> Grammar TomlToken True a
 optSpacing inner =
   do
-    ignore $ optional (match Whitespace)
+    optWhitespace
     res <- inner
-    ignore $ optional (match Whitespace)
+    optWhitespace
     pure res
 
 mutual
@@ -71,9 +78,9 @@ mutual
   list =
     do
       ignore $ match LeftBracket
-      ignore $ optional (match Whitespace)
+      optWhitespace
       values <- sepBy (optSpacing $ match Comma) value
-      ignore $ optional (match Whitespace)
+      optWhitespace
       ignore $ match RightBracket
       pure (Lst values)
 
@@ -85,7 +92,9 @@ kv : Grammar TomlToken True (Maybe (List String, Value))
 kv =
   do
     key <- keyword
+    optWhitespace
     match Equals
+    optWhitespace
     v <- value
     pure $ Just (key, v)
 
