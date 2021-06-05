@@ -1,3 +1,5 @@
+include config.mk
+
 all : inigo
 .PHONY : bootstrap server inigo install static local-server deploy-init deploy test
 
@@ -26,8 +28,8 @@ inigo :
 	@echo "Built \"build/exec/inigo\""
 
 install : inigo
-	cp build/exec/inigo /usr/local/bin
-	chmod +x /usr/local/bin/inigo
+	cp build/exec/inigo $(INSTALL_DIR)
+	chmod +x $(INSTALL_DIR)/inigo
 
 static :
 	env SKIP_EXT=true node Server/InigoStatic/localize.js Server/InigoStatic/Pages Server/InigoStatic/Local/pages.json
