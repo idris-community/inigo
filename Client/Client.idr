@@ -16,7 +16,7 @@ import Client.Skeleton.Skeleton
 import Client.Util
 import Data.List
 import Data.Maybe
-import Data.Strings
+import Data.String
 import Extra.Either
 import Extra.String
 import Fmt
@@ -69,75 +69,75 @@ fetchDepsAction serverName includeDevDeps build =
     pure $ FetchDeps server includeDevDeps build
 
 getAction : List String -> Maybe Action
-getAction [_, "archive", packageFile, outFile] =
+getAction ["archive", packageFile, outFile] =
   Just (Archive packageFile outFile)
 
-getAction [_, "extract", archiveFile, outPath] =
+getAction ["extract", archiveFile, outPath] =
   Just (Extract archiveFile outPath)
 
-getAction [_, "build-deps"] =
+getAction ["build-deps"] =
   Just BuildDeps
 
-getAction [_, "build", codeGen] =
+getAction ["build", codeGen] =
   do
     codeGen <- getCodeGen codeGen
     pure $ Build codeGen
 
-getAction [_, "build"] =
+getAction ["build"] =
   Just (Build Node)
 
-getAction (_ :: "exec" :: userArgs) =
+getAction ("exec" :: userArgs) =
   Just (Exec Node userArgs)
 
-getAction (_ :: "fetch-deps" :: serverName :: extraArgs) =
+getAction ("fetch-deps" :: serverName :: extraArgs) =
   let
     build = not $ isJust $ find (== "--no-build") extraArgs
     includeDevDeps = isJust $ find (== "--dev") extraArgs
   in
     fetchDepsAction serverName includeDevDeps build
 
-getAction [_, "push", serverName, archive] =
+getAction ["push", serverName, archive] =
   do
     server <- getServer serverName
     pure $ Push server archive
 
-getAction [_, "pull", serverName, packageNS, packageName] =
+getAction ["pull", serverName, packageNS, packageName] =
   do
     server <- getServer serverName
     pure $ Pull server packageNS packageName Nothing
 
-getAction [_, "pull", serverName, packageNS, packageName, versionStr] =
+getAction ["pull", serverName, packageNS, packageName, versionStr] =
   do
     server <- getServer serverName
     version <- parseVersion versionStr
     pure $ Pull server packageNS packageName (Just version)
 
-getAction [_, "test", codeGen] =
+getAction ["test", codeGen] =
   do
     codeGen <- getCodeGen codeGen
     pure $ Test codeGen
 
-getAction [_, "test"] =
+getAction ["test"] =
   Just (Test Node)
 
-getAction [_, "register", serverName] =
+getAction ["register", serverName] =
   do
     server <- getServer serverName
     pure $ Register server
 
-getAction [_, "login", serverName] =
+getAction ["login", serverName] =
   do
     server <- getServer serverName
     pure $ Login server
 
-getAction [_, "init", packageNS, packageName] =
+getAction ["init", packageNS, packageName] =
   Just (Init packageNS packageName)
 
 getAction _ = Nothing
 
 getActionIO : IO (Maybe Action)
 getActionIO =
-  map getAction getArgs
+  map (getAction . drop 2) getArgs
 
 runAction : Action -> IO ()
 runAction (Archive packageFile outFile) =

@@ -185,7 +185,7 @@ readAccountHash ns =
   do
     Just accountToml <- read (accountKey ns)
       | Nothing => pure Nothing
-    Just account <- lift (Account.decode accountToml)
+    let Just account = Account.decode accountToml
       | Nothing => pure Nothing
     pure (Just $ (kdf account, hash account))
 

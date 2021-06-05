@@ -123,8 +123,8 @@ generateKey__prim : AnyPtr -> List String -> promise (List AnyPtr)
 %foreign (promisifyPrim (arrayBufferEnc64 "(algo, key, data) => crypto.subtle.sign(algo, key, new TextEncoder().encode(data)).then(arrayBufferEnc64)"))
 sign__prim : AnyPtr -> AnyPtr -> String -> promise String
 
-%foreign (promisifyPrim (arrayBufferDec64 "(algo, key, signature, data) => crypto.subtle.verify(algo, key, arrayBufferDec64(signature), new TextEncoder().encode(data)).then((res) => res ? 0n : 1n)"))
-verify__prim : AnyPtr -> AnyPtr -> String -> String -> promise Bool
+%foreign (promisifyPrim (arrayBufferDec64 "(algo, key, signature, data) => crypto.subtle.verify(algo, key, arrayBufferDec64(signature), new TextEncoder().encode(data)).then((res) => res ? 1n : 0n)"))
+verify__prim : AnyPtr -> AnyPtr -> String -> String -> promise Int
 
 %foreign ("node:lambda:" ++ (arrayBufferEnc64 "(len) => arrayBufferEnc64(crypto.getRandomValues(new Uint8Array(Number(len))))"))
 getRand__prim : Int -> PrimIO String
@@ -179,7 +179,7 @@ verify : Algorithm -> Key -> String -> String -> Promise Bool
 verify algo key sig target =
   do
     algoEnc <- encodeAlgorithm algo
-    promisify (verify__prim (toAnyPtr algoEnc) key sig target)
+    intToBool <$> promisify (verify__prim (toAnyPtr algoEnc) key sig target)
 
 export
 getRand : Int -> Promise String

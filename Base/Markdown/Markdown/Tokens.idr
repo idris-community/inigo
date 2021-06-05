@@ -1,6 +1,6 @@
 module Markdown.Tokens
 
-import Data.Strings
+import Data.String
 import Markdown.String
 import Extra.String
 import public Text.Token

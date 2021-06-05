@@ -61,35 +61,35 @@ pin =
 exact : Grammar SemVarToken True Requirement 
 exact =
   do
-    optional (match CmpEQ)
+    ignore $ optional (match CmpEQ)
     v <- version
     pure $ EQ v
 
 gt : Grammar SemVarToken True Requirement 
 gt =
   do
-    optional (match CmpGT)
+    ignore $ optional (match CmpGT)
     v <- version
     pure $ GT v
 
 lt : Grammar SemVarToken True Requirement 
 lt =
   do
-    optional (match CmpLT)
+    ignore $ optional (match CmpLT)
     v <- version
     pure $ LT v
 
 gte : Grammar SemVarToken True Requirement 
 gte =
   do
-    optional (match CmpGTE)
+    ignore $ optional (match CmpGTE)
     v <- version
     pure $ GTE v
 
 lte : Grammar SemVarToken True Requirement 
 lte =
   do
-    optional (match CmpLTE)
+    ignore $ optional (match CmpLTE)
     v <- version
     pure $ LTE v
 
@@ -97,9 +97,9 @@ range : Grammar SemVarToken True Requirement
 range =
   do
     v0 <- version
-    optional (match Whitespace)
+    ignore $ optional (match Whitespace)
     match Hyphen
-    optional (match Whitespace)
+    ignore $ optional (match Whitespace)
     v1 <- version
     pure $ AND (GTE v0) (LTE v1)
 
@@ -128,9 +128,9 @@ disjuction : Grammar SemVarToken True Requirement
 disjuction =
   do
     v0 <- simpleRequirement
-    optional (match Whitespace)
-    match Pipe
-    optional (match Whitespace)
+    ignore $ optional (match Whitespace)
+    ignore $ match Pipe
+    ignore $ optional (match Whitespace)
     v1 <- simpleRequirement
     pure $ OR v0 v1
 

@@ -23,7 +23,7 @@ inigo :
 	idris2 --build Inigo.ipkg --cg node
 	echo '#!/usr/bin/env node' | cat - build/exec/inigo > temp && mv temp build/exec/inigo
 	chmod +x build/exec/inigo
-	echo "Built \"build/exec/inigo\""
+	@echo "Built \"build/exec/inigo\""
 
 install : inigo
 	cp build/exec/inigo /usr/local/bin

@@ -1,7 +1,7 @@
 module Server.InigoServer.Util
 
 import Data.Either
-import Data.Strings
+import Data.String
 import Inigo.Async.Base
 import Inigo.Async.CloudFlare.Worker
 import Inigo.Async.Promise

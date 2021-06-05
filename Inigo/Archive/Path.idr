@@ -1,7 +1,7 @@
 module Inigo.Archive.Path
 
 import Data.List
-import Data.Strings
+import Data.String
 import Extra.String
 import Inigo.Package.Package
 import System.Path

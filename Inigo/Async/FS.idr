@@ -18,15 +18,15 @@ fs_writeFile__prim : String -> String -> promise ()
 %foreign (promisifyPrim "(path,contents)=>require('fs').promises.writeFile(path,contents)")
 fs_writeFileBuf__prim : String -> Buffer -> promise ()
 
-%foreign (promisifyPrim "(path,r)=>require('fs').promises.mkdir(path,{recursive: r == 0n})")
-fs_mkdir__prim : String -> Bool -> promise ()
+%foreign (promisifyPrim "(path,r)=>require('fs').promises.mkdir(path,{recursive: r === 1n})")
+fs_mkdir__prim : String -> Int -> promise ()
 
 %foreign (promisifyPrim "(path)=>require('fs').promises.readdir(path).then(__prim_js2idris_array)")
 fs_getFiles__prim : String -> promise (List String)
 
 -- TODO: Include more stat?
-%foreign (promisifyPrim "(path)=>require('fs').promises.stat(path).then((s)=>s.isDirectory() ? 0n : 1n)")
-fs_stat__prim : String -> promise Bool
+%foreign (promisifyPrim "(path)=>require('fs').promises.stat(path).then((s)=>s.isDirectory() ? 1n : 0n)")
+fs_stat__prim : String -> promise Int
 
 export
 fs_readFile : String -> Promise String
@@ -51,7 +51,7 @@ fs_writeFileBuf path contents =
 export
 fs_mkdir : Bool -> String -> Promise ()
 fs_mkdir recursive path =
-  promisify (fs_mkdir__prim path recursive)
+  promisify (fs_mkdir__prim path (boolToInt recursive))
 
 export
 fs_getFiles : String -> Promise (List String)
@@ -61,7 +61,7 @@ fs_getFiles path =
 export
 fs_stat : String -> Promise Bool
 fs_stat path =
-  promisify (fs_stat__prim path)
+  intToBool <$> promisify (fs_stat__prim path)
 
 export
 fs_getFilesR : String -> Promise (List String)

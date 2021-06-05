@@ -1,7 +1,7 @@
 module Client.Action.Build
 
 import Data.List
-import Data.Strings
+import Data.String
 import Inigo.Async.Base
 import Inigo.Async.FS
 import Inigo.Async.Promise
@@ -27,8 +27,7 @@ export
 runBuild : CodeGen -> Package -> Promise ()
 runBuild codeGen pkg =
   do
-    system "idris2" ["--build", iPkgFile, "--cg", toString codeGen] False True
-    pure ()
+    ignore $ system "idris2" ["--build", iPkgFile, "--cg", toString codeGen] False True
 
 export
 build : CodeGen -> Promise ()

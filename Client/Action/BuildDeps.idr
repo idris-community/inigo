@@ -1,7 +1,7 @@
 module Client.Action.BuildDeps
 
 import Data.List
-import Data.Strings
+import Data.String
 import Fmt
 import Inigo.Async.Base
 import Inigo.Async.FS
@@ -14,7 +14,7 @@ buildIPkg : String -> Promise ()
 buildIPkg ipkg =
   do
     log (fmt "Compiling %s" ipkg)
-    system "idris2" ["--build", ipkg] False True
+    ignore $ system "idris2" ["--build", ipkg] False True
     log (fmt "Compiled %s" ipkg)
 
 export
@@ -23,5 +23,4 @@ buildDeps =
   do
     files <- fs_getFilesR depsDir
     let ipkgs = filter (isSuffixOf ".ipkg") files
-    all $ map buildIPkg ipkgs 
-    pure ()
+    ignore $ all $ map buildIPkg ipkgs

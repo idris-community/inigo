@@ -11,8 +11,8 @@ import Test.Inigo.Package.PackageTest
 import Toml
 
 exampleIndexToml : String
-exampleIndexToml =
-  "[[pkg]]
+exampleIndexToml = """
+[[pkg]]
 ns=\"Example\"
 package=\"Cool\"
 description=\"cool package\"
@@ -22,7 +22,8 @@ version=\"1.2.3\"
 ns=\"Example\"
 package=\"Funk\"
 description=\"funky package\"
-version=\"10.0.0\""
+version=\"10.0.0\"
+"""
 
 exampleIndex : PackageIndex
 exampleIndex =

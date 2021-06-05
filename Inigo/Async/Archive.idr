@@ -3,7 +3,7 @@ module Inigo.Async.Archive
 import Data.Buffer
 import Data.List
 import Data.Maybe
-import Data.Strings
+import Data.String
 import Extra.Buffer
 import Extra.String
 import Fmt
@@ -76,5 +76,4 @@ extractArchive archive outPath =
   do
     contents <- liftIO (readAll archive)
     files <- expect "Failed to read archive" (Archive.decode contents)
-    all (map (decompressFile outPath) files)
-    pure ()
+    ignore $ all (map (decompressFile outPath) files)

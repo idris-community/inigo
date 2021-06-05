@@ -26,7 +26,7 @@ getPackage server packageNS packageName maybeVersion =
     let url = toString (fromHostPath (host server) path)
     log ("Requesting " ++ url ++ "...")
     contents <- fetch url
-    Right package <- lift (parsePackage contents)
+    let Right package = parsePackage contents
       | Left err => reject ("Invalid package: " ++ err)
     pure package
 

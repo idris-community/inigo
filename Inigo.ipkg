@@ -1,0 +1,10 @@
+package inigo
+
+modules = Client.Client
+depends = idris2, contrib
+
+sourcedir = ""
+
+version = 0.0.1
+main = Client.Client
+executable = inigo

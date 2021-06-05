@@ -11,15 +11,15 @@ import Test.Inigo.Package.PackageTest
 import Toml
 
 exampleDepsToml : String
-exampleDepsToml =
-  "['1.2.3']
+exampleDepsToml = """
+['1.2.3']
 deps.a='=5.0.0'
 dev.b='=6.0.0'
 
 ['1.2.4']
 deps.a='=5.1.0'
 dev.b='=6.1.0'
-"
+"""
 
 exampleDepsExp : PackageDeps
 exampleDepsExp =

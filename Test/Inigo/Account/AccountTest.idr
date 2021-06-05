@@ -11,14 +11,15 @@ simpleAccount =
   MkAccount "tom" "tom@example.com" (PBKDF2 Sha512 "salt" 1000) "aaa"
 
 simpleAccountToml : String
-simpleAccountToml =
-  "ns=\"tom\"
+simpleAccountToml ="""
+ns=\"tom\"
 email=\"tom@example.com\"
 kdf.type=\"PBKDF2\"
 kdf.sha=\"SHA-512\"
 kdf.salt=\"salt\"
 kdf.iterations=1000
-hash=\"aaa\""
+hash=\"aaa\"
+"""
 
 export
 suite : Test

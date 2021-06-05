@@ -72,3 +72,8 @@ export
 promisify : promise a -> Promise a
 promisify prim =
   MkPromise (\ok, err => primIO $ prim ok err)
+
+export
+boolToInt : Bool -> Int
+boolToInt False = 0
+boolToInt True = 1

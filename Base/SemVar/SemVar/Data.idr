@@ -1,6 +1,6 @@
 module SemVar.Data
 
-import Data.Strings
+import Data.String
 import Data.List
 import Data.Maybe
 

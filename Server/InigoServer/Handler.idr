@@ -4,7 +4,7 @@ import Data.Buffer
 import Data.Either
 import Data.List
 import Data.Maybe
-import Data.Strings
+import Data.String
 import Extra.Buffer
 import Extra.Either
 import Extra.String
@@ -150,7 +150,7 @@ handleAccountPost ns body =
     salt <- getRand 20
     let kdf = defaultHash salt
     hashedPassphrase <- hash kdf passphrase
-    Right account <- lift $ mkAccount ns email kdf passphrase hashedPassphrase
+    let Right account = mkAccount ns email kdf passphrase hashedPassphrase
       | Left err => pure (400, err, [])
     Nothing <- KVOps.newAccount account
       | Just (err, msg) => pure (err, msg, [])
@@ -159,11 +159,11 @@ handleAccountPost ns body =
     getAccountValues : String -> Promise (Either Response (String, String))
     getAccountValues body =
       do
-        Just toml <- lift $ parseToml body
+        let Just toml = parseToml body
           | Nothing => pure $ Left (400, "Bad request: invalid body toml", [])
-        Just (Str email) <- lift $ get ["email"] toml
+        let Just (Str email) = get ["email"] toml
           | _ => pure $ Left (400, "Bad request: missing email", [])
-        Just (Str passphrase) <- lift $ get ["passphrase"] toml
+        let Just (Str passphrase) = get ["passphrase"] toml
           | _ => pure $ Left (400, "Bad request: missing passphrase", [])
         pure $ Right (email, passphrase)
 

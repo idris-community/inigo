@@ -1,6 +1,6 @@
 module Toml.Data
 
-import Data.Strings
+import Data.String
 import Data.List
 
 import Extra.String
