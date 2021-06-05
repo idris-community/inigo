@@ -24,4 +24,4 @@ exec codeGen build userArgs =
       | Nothing => reject "No executable set in Inigo config"
     let (cmd, args) = CodeGen.cmdArgs codeGen (execDir </> e)
     log (fmt "Executing %s with args %s..." e (show userArgs))
-    ignore $ system cmd (args ++ userArgs) True True
+    ignore $ systemWithStdIO cmd (args ++ userArgs) True True
