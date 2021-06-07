@@ -86,8 +86,18 @@ getAction ["build", codeGen] =
 getAction ["build"] =
   Just (Build Node)
 
-getAction ("exec" :: userArgs) =
-  Just (Exec Node userArgs)
+getAction ("exec" :: args) =
+  do
+    let (execArgs, progArgs) = splitArgs args
+    case execArgs of
+      [] => Just (Exec Node progArgs)
+      [cg] => Just (Exec !(getCodeGen cg) progArgs)
+      _ => Nothing
+  where
+    splitArgs : List String -> (List String, List String)
+    splitArgs [] = ([], [])
+    splitArgs ("--" :: args) = ([], args)
+    splitArgs (arg :: args) = mapFst (arg ::) (splitArgs args)
 
 getAction ("fetch-deps" :: serverName :: extraArgs) =
   let
@@ -208,7 +218,7 @@ short : String -> Maybe String
 short "archive" = Just "archive <pkg_file> <out_file>: Archive a given package"
 short "build" = Just "build <code-gen=node>: Build program under given code gen"
 short "build-deps" = Just "build-deps: Build all deps"
-short "exec" = Just "exec ...args: Execute program with given args [WIP codegen]"
+short "exec" = Just "exec <code-gen=node> -- ...args: Execute program with given args"
 short "extract" = Just "extract <archive_file> <out_path>: Extract a given archive to directory"
 short "fetch-deps" = Just "fetch-deps <server>: Fetch and build all deps (opts: --no-build, --dev)"
 short "init" = Just "init <namespace> <package>: Initialize a new project with given namespace and package name"
