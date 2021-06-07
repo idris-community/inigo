@@ -24,9 +24,11 @@ fs_mkdir__prim : String -> Int -> promise ()
 %foreign (promisifyPrim "(path)=>require('fs').promises.readdir(path).then(__prim_js2idris_array)")
 fs_getFiles__prim : String -> promise (List String)
 
--- TODO: Include more stat?
 %foreign (promisifyPrim "(path)=>require('fs').promises.stat(path).then((s)=>s.isDirectory() ? 1n : 0n)")
-fs_stat__prim : String -> promise Int
+fs_isDir__prim : String -> promise Int
+
+%foreign (promisifyPrim "(path)=>require('fs').promises.access(path).then(()=>1n).catch(()=>0n)")
+fs_exists__prim : String -> promise Int
 
 export
 fs_readFile : String -> Promise String
@@ -59,9 +61,14 @@ fs_getFiles path =
   promisify (fs_getFiles__prim path)
 
 export
-fs_stat : String -> Promise Bool
-fs_stat path =
-  intToBool <$> promisify (fs_stat__prim path)
+fs_isDir : String -> Promise Bool
+fs_isDir path =
+  intToBool <$> promisify (fs_isDir__prim path)
+
+export
+fs_exists : String -> Promise Bool
+fs_exists path =
+  intToBool <$> promisify (fs_exists__prim path)
 
 export
 fs_getFilesR : String -> Promise (List String)
@@ -71,7 +78,7 @@ fs_getFilesR path =
   doGetFilesR : String -> Promise (List String)
   doGetFilesR path =
     do
-      isDir <- fs_stat path
+      isDir <- fs_isDir path
       if isDir
         then do
           entries <- fs_getFiles path
