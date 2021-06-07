@@ -1,7 +1,7 @@
 include config.mk
 
 all : inigo
-.PHONY : bootstrap server inigo install static local-server deploy-init deploy test
+.PHONY : bootstrap server inigo install static local-server deploy-init deploy test clean distclean
 
 define build_base_dep
 	(cd Base/$(1) && idris2 --build Bootstrap.ipkg --build-dir ../../build)
@@ -56,3 +56,9 @@ deploy : static server
 
 test :
 	idris2 --find-ipkg Test/Suite.idr --cg node -x suite
+
+clean :
+	idris2 --clean Inigo.ipkg
+
+distclean :
+	$(RM) -r build
