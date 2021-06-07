@@ -3,6 +3,7 @@ module Client.Client
 import Client.Action.Archive
 import Client.Action.Build
 import Client.Action.BuildDeps
+import Client.Action.Clean
 import Client.Action.Exec
 import Client.Action.FetchDeps
 import Client.Action.Init
@@ -52,6 +53,7 @@ data Action : Type where
   Archive : String -> String -> Action
   Build : CodeGen -> Action
   BuildDeps : Action
+  Clean : Bool -> Action
   Exec : CodeGen -> List String -> Action
   Extract : String -> String -> Action
   FetchDeps : Server -> Bool -> Bool -> Action
@@ -85,6 +87,12 @@ getAction ["build", codeGen] =
 
 getAction ["build"] =
   Just (Build Node)
+
+getAction ["clean"] =
+  Just (Clean False)
+
+getAction ["clean", "deps"] =
+  Just (Clean True)
 
 getAction ("exec" :: args) =
   do
@@ -168,6 +176,9 @@ runAction BuildDeps =
 runAction (Build codeGen) =
   run (build codeGen)
 
+runAction (Clean deps) =
+  run (clean deps)
+
 runAction (Exec codeGen userArgs) =
   run (exec codeGen True userArgs) -- TODO: Make build a flag
 
@@ -218,6 +229,7 @@ short : String -> Maybe String
 short "archive" = Just "archive <pkg_file> <out_file>: Archive a given package"
 short "build" = Just "build <code-gen=node>: Build program under given code gen"
 short "build-deps" = Just "build-deps: Build all deps"
+short "clean" = Just "clean <deps?>: Clean package artifacts, optionally including deps"
 short "exec" = Just "exec <code-gen=node> -- ...args: Execute program with given args"
 short "extract" = Just "extract <archive_file> <out_path>: Extract a given archive to directory"
 short "fetch-deps" = Just "fetch-deps <server>: Fetch and build all deps (opts: --no-build, --dev)"
@@ -237,6 +249,7 @@ usage =
         [ "archive"
         , "build"
         , "build-deps"
+        , "clean"
         , "exec"
         , "extract"
         , "fetch-deps"

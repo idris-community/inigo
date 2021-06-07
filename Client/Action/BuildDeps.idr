@@ -7,6 +7,7 @@ import Inigo.Async.Base
 import Inigo.Async.FS
 import Inigo.Async.Promise
 
+export
 depsDir : String
 depsDir = "./Deps"
 
