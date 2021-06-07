@@ -129,9 +129,10 @@ generateIPkg isDep pkg =
     executable = fromMaybe "" $ map ((++) "\nexecutable = ") (executable pkg)
     modules' = whenCons pkg.modules $ fmt "modules = %s " $ join ", " (modules pkg)
     depends' = whenCons pkg.depends $ fmt "depends = %s " $ join ", " (depends pkg)
-    sourceDir = if isDep
-      then fmt "Deps/%s/%s" (ns pkg) (package pkg)
-      else ""
+    sourceDir = ""
+    buildDir = if isDep
+      then "../../../build"
+      else "build"
   in
     fmt """
 package %s
@@ -140,6 +141,7 @@ package %s
 %s
 
 sourcedir = %s
+builddir = %s
 
 version = %s%s%s
-""" (package pkg) modules' depends' (quote sourceDir) (show $ version pkg) main executable
+""" (package pkg) modules' depends' (quote sourceDir) (quote buildDir) (show $ version pkg) main executable
