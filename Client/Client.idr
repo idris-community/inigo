@@ -79,7 +79,7 @@ getAction ["extract", archiveFile, outPath] =
 
 getAction ("build-deps" :: args) =
   let
-    dev = isJust $ find (== "--dev") args
+    dev = any (== "--dev") args
   in
     Just (BuildDeps dev)
 
@@ -112,8 +112,8 @@ getAction ("exec" :: args) =
 
 getAction ("fetch-deps" :: serverName :: extraArgs) =
   let
-    build = not $ isJust $ find (== "--no-build") extraArgs
-    includeDevDeps = isJust $ find (== "--dev") extraArgs
+    build = not $ any (== "--no-build") extraArgs
+    includeDevDeps = any (== "--dev") extraArgs
   in
     fetchDepsAction serverName includeDevDeps build
 

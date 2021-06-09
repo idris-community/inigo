@@ -93,7 +93,7 @@ filterTests tests =
   where
     hasOnly : List TestCase -> Bool
     hasOnly =
-      isJust . find (\(_, _, f) => Set.contains Only f)
+      any (\(_, _, f) => Set.contains Only f)
 
     filterSkips : TestCase -> Bool
     filterSkips (_, _, flags) =

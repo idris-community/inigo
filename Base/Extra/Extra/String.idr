@@ -53,7 +53,7 @@ includesAny search =
   let
     searchChars = unpack search
   in
-    isJust . find (\c => c `elem` searchChars) . unpack
+     any (\c => c `elem` searchChars) . unpack
 
 export
 quote : String -> String
