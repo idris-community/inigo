@@ -1,5 +1,6 @@
 module Inigo.Async.Base
 
+import Data.Maybe
 import Inigo.Async.Promise
 import Inigo.Async.Util
 
@@ -12,8 +13,8 @@ reject__prim : String -> promise a
 %foreign (promisifyResolve "null" "(text)=>console.log(text)")
 log__prim : String -> promise ()
 
-%foreign (promisifyPrim (toArray "(cmd,args,detached,verbose)=>new Promise((resolve,reject)=>{let opts={detached:detached===1n, stdio: ['ignore', process.stdout, process.stderr]};require('child_process').spawn(cmd, toArray(args), opts).on('close', (code) => resolve(code))})"))
-system__prim : String -> List String -> Int -> Int -> promise Int
+%foreign (promisifyPrim (toArray "(cmd,args,workDir,detached,verbose)=>new Promise((resolve,reject)=>{let opts={detached:detached===1n, stdio: ['ignore', process.stdout, process.stderr],cwd:workDir};require('child_process').spawn(cmd, toArray(args), opts).on('close', (code) => resolve(code))})"))
+system__prim : String -> List String -> String -> Int -> Int -> promise Int
 
 %foreign (promisifyPrim (toArray "(cmd,args,detached,verbose)=>new Promise((resolve,reject)=>{let opts={detached:detached===1n, stdio: 'inherit'};require('child_process').spawn(cmd, toArray(args), opts).on('close', (code) => resolve(code))})"))
 systemWithStdIO__prim : String -> List String -> Int -> Int -> promise Int
@@ -34,9 +35,9 @@ log text =
   promisify (log__prim text)
 
 export
-system : String -> List String -> Bool -> Bool -> Promise Int
-system cmd args detached verbose =
-  promisify (system__prim cmd args (boolToInt detached) (boolToInt verbose))
+system : String -> List String -> Maybe String -> Bool -> Bool -> Promise Int
+system cmd args cwd detached verbose =
+  promisify (system__prim cmd args (fromMaybe "" cwd) (boolToInt detached) (boolToInt verbose))
 
 export
 systemWithStdIO : String -> List String -> Bool -> Bool -> Promise Int
