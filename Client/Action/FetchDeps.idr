@@ -8,6 +8,8 @@ import Data.SortedSet as Set
 import Extra.String
 import Inigo.Async.Base
 import Inigo.Async.Fetch
+import Inigo.Async.FS
+import Inigo.Async.Git
 import Inigo.Async.Package
 import Inigo.Async.Promise
 import Inigo.Package.Package
@@ -15,6 +17,7 @@ import Inigo.Package.PackageDeps
 import Inigo.Util.Url.Url
 import SemVar
 import SemVar.Sat
+import System.Path
 
 getPackageDepTree : Server -> String -> String -> Promise PackageDepTree
 getPackageDepTree server packageNS packageName =
@@ -84,3 +87,25 @@ fetchDeps server includeDevDeps build =
         Just (packageNS, packageName) =>
           do
             pull server packageNS packageName (Just version)
+
+export
+fetchExtraDeps : Bool -> Bool -> Promise ()
+fetchExtraDeps devDeps build = do
+    pkg <- currPackage
+    ignore $ all $ fetchExtraDep <$> pkg.extraDeps
+  where
+    genIPkg : String -> String -> Promise ()
+    genIPkg dest subDir = do
+        let buildDir = joinPath (".." <$ splitPath (dest </> subDir)) </> "build"
+        let toml = dest </> subDir </> "Inigo.toml"
+        let iPkgFile = dest </> subDir </> "Inigo.ipkg"
+        pkg <- readPackage toml
+        log "Writing \{iPkgFile}..."
+        fs_writeFile iPkgFile $ generateIPkg (Just buildDir) pkg
+
+    fetchExtraDep : ExtraDep -> Promise ()
+    fetchExtraDep (MkExtraDep Git commit url subDirs) = do
+        let dest = "Deps" </> genFolder url
+        log "Downloading package from \"\{url}\""
+        ignore $ git_downloadTo url (Just commit) dest
+        traverse_ (genIPkg dest) subDirs

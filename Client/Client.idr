@@ -52,7 +52,7 @@ requirePrompt prompt validator =
 data Action : Type where
   Archive : String -> String -> Action
   Build : CodeGen -> Action
-  BuildDeps : Action
+  BuildDeps : Bool -> Action
   Clean : Bool -> Action
   Exec : CodeGen -> List String -> Action
   Extract : String -> String -> Action
@@ -77,8 +77,11 @@ getAction ["archive", packageFile, outFile] =
 getAction ["extract", archiveFile, outPath] =
   Just (Extract archiveFile outPath)
 
-getAction ["build-deps"] =
-  Just BuildDeps
+getAction ("build-deps" :: args) =
+  let
+    dev = isJust $ find (== "--dev") args
+  in
+    Just (BuildDeps dev)
 
 getAction ["build", codeGen] =
   do
@@ -168,10 +171,12 @@ runAction (Extract archiveFile outPath) =
     putStrLn ("Extracting " ++ archiveFile ++ " from " ++ outPath)
     run (extractArchive archiveFile outPath)
 
-runAction BuildDeps =
+runAction (BuildDeps dev) =
   do
     putStrLn "Building deps..."
-    run buildDeps
+    run $ parallel
+        (buildDeps dev)
+        buildExtraDeps
 
 runAction (Build codeGen) =
   run (build codeGen)
@@ -185,7 +190,9 @@ runAction (Exec codeGen userArgs) =
 runAction (FetchDeps server includeDevDeps build) =
   do
     putStrLn ("Feching deps from " ++ toString server ++ (if includeDevDeps then " including dev deps" else ""))
-    run (fetchDeps server includeDevDeps build)
+    run $ parallel
+        (fetchDeps server includeDevDeps build)
+        (fetchExtraDeps includeDevDeps build)
 
 runAction (Push server archive) =
   do
