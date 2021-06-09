@@ -11,7 +11,7 @@ import Inigo.Package.Package
 
 cleanIPkg : String -> Promise ()
 cleanIPkg ipkg =
-  ignore $ system "idris2" ["--clean", ipkg] False True
+  ignore $ system "idris2" ["--clean", ipkg] Nothing False True
 
 export
 clean : Bool -> Promise ()

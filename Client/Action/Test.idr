@@ -14,4 +14,4 @@ test codeGen =
   do
     pkg <- Build.writeIPkgFile
     log (fmt "Running tests...")
-    ignore $ system "idris2" ["--find-ipkg", "Test/Suite.idr", "--cg", CodeGen.toString codeGen, "-x", "suite"] True True
+    ignore $ system "idris2" ["--find-ipkg", "Test/Suite.idr", "--cg", CodeGen.toString codeGen, "-x", "suite"] Nothing True True

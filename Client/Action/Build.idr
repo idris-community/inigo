@@ -20,14 +20,14 @@ writeIPkgFile =
   do
     pkg <- Inigo.Async.Package.currPackage
     -- TODO: Only build if not exists ?
-    fs_writeFile iPkgFile (Package.Package.generateIPkg False pkg)
+    fs_writeFile iPkgFile (Package.Package.generateIPkg Nothing pkg)
     pure pkg
 
 export
 runBuild : CodeGen -> Package -> Promise ()
 runBuild codeGen pkg =
   do
-    ignore $ system "idris2" ["--build", iPkgFile, "--cg", toString codeGen] False True
+    ignore $ system "idris2" ["--build", iPkgFile, "--cg", toString codeGen] Nothing False True
 
 export
 build : CodeGen -> Promise ()
