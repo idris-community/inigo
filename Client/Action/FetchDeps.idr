@@ -1,6 +1,7 @@
 module Client.Action.FetchDeps
 
 import Client.Action.BuildDeps
+import Client.Action.CacheDeps
 import Client.Action.Pull
 import Client.Server
 import Data.List
@@ -8,10 +9,13 @@ import Data.SortedSet as Set
 import Extra.String
 import Inigo.Async.Base
 import Inigo.Async.Fetch
+import Inigo.Async.FS
+import Inigo.Async.Git
 import Inigo.Async.Package
 import Inigo.Async.Promise
 import Inigo.Package.Package
 import Inigo.Package.PackageDeps
+import Inigo.Paths
 import Inigo.Util.Url.Url
 import SemVar
 import SemVar.Sat
@@ -84,3 +88,62 @@ fetchDeps server includeDevDeps build =
         Just (packageNS, packageName) =>
           do
             pull server packageNS packageName (Just version)
+
+||| Get all elems of the left list not present in the right list
+total
+difference : Eq a => List a -> List a -> List a
+difference xs [] = xs
+difference xs (y :: ys) = difference (delete y xs) ys
+
+export
+fetchExtraDeps : Bool -> Bool -> Promise ()
+fetchExtraDeps devDeps build = do
+    pkg <- currPackage
+    deps <- fetchDeps [] pkg.extraDeps
+    pkgs <- foldlM getExtraDepPkg [] deps
+    writeDepCache pkgs
+  where
+    getSubDirPkg : String -> List (String, Package) -> String -> Promise (List (String, Package))
+    getSubDirPkg depDir pkgs subDir = do
+        let srcDir = inigoDepDir </> depDir </> subDir
+        pkg <- readPackage $ srcDir </> inigoTomlPath
+        if any ((== pkg) . snd) pkgs
+            then pure pkgs
+            else pure ((srcDir, pkg) :: pkgs)
+
+    getExtraDepPkg : List (String, Package) -> ExtraDep -> Promise (List (String, Package))
+    getExtraDepPkg pkgs dep@(MkExtraDep _ _ _ subDirs) =
+        foldlM (getSubDirPkg $ getExtraDepDir dep) pkgs subDirs
+
+    genIPkg : String -> String -> Promise Package
+    genIPkg dest subDir = do
+        let buildDir = joinPath (".." <$ splitPath (dest </> subDir)) </> "build"
+        let toml = dest </> subDir </> "Inigo.toml"
+        let iPkgFile = dest </> subDir </> "Inigo.ipkg"
+        pkg <- readPackage toml
+        fs_writeFile iPkgFile $ generateIPkg (Just buildDir) pkg
+        pure pkg
+
+    fetchExtraDep : ExtraDep -> Promise (List Package)
+    fetchExtraDep pkg@(MkExtraDep Git commit url subDirs) = do
+        let dest = inigoDepDir </> getExtraDepDir pkg
+        log "Downloading package from \"\{url}\""
+        ignore $ git_downloadTo url (Just commit) dest
+        traverse (genIPkg dest) subDirs
+
+    fetchDeps : List ExtraDep -> List ExtraDep -> Promise (List ExtraDep) -- if this is too slow, use SortedSet
+    fetchDeps done [] = pure done
+    fetchDeps done (MkExtraDep _ _ _ [] :: todo) = fetchDeps done todo
+    fetchDeps done (pkg@(MkExtraDep Git commit url subDirs0) :: todo) = case find (eqIgnoreSubDirs pkg) done of
+        Nothing => do -- doesn't exist yet, download and add dependencies
+            pkgs <- fetchExtraDep pkg
+            let todo' = foldl (\acc, pkg => pkg.extraDeps ++ acc) todo pkgs
+            fetchDeps (pkg :: done) todo'
+        Just pkg@(MkExtraDep Git commit url subDirs1) => case difference subDirs0 subDirs1 of
+            [] => fetchDeps done todo -- no missing subdirs, move on
+            missing => do
+                let dest = inigoDepDir </> getExtraDepDir pkg
+                pkgs <- traverse (genIPkg dest) missing
+                let todo' = foldl (\acc, pkg => pkg.extraDeps ++ acc) todo pkgs
+                let done' = MkExtraDep Git commit url (missing ++ subDirs0) :: filter (not . eqIgnoreSubDirs pkg) done
+                fetchDeps done' todo

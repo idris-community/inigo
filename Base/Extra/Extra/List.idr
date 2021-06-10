@@ -83,7 +83,7 @@ replace l k v =
         Just (S k) =>
           (acc, Just k)
         _ =>
-          if isJust (find (== i) matches) then
+          if any (== i) matches then
             -- We need to insert a replacement and then skip N els
             (repl ++ acc, Just skipLen)
           else

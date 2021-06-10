@@ -1,27 +1,42 @@
 module Client.Action.BuildDeps
 
+import Client.Action.CacheDeps
 import Data.List
 import Data.String
 import Fmt
 import Inigo.Async.Base
 import Inigo.Async.FS
+import Inigo.Async.Package
 import Inigo.Async.Promise
-
-export
-depsDir : String
-depsDir = "./Deps"
+import Inigo.Package.Package
+import Inigo.Paths
+import SemVar
 
 buildIPkg : String -> Promise ()
-buildIPkg ipkg =
+buildIPkg path =
   do
-    log (fmt "Compiling %s" ipkg)
-    ignore $ system "idris2" ["--build", ipkg] False True
-    log (fmt "Compiled %s" ipkg)
+    log (fmt "Compiling %s" (path </> inigoIPkgPath))
+    debugLog "\{path}$ idris2 --build \{inigoIPkgPath}"
+    0 <- system "idris2" ["--build", inigoIPkgPath] (Just path) False True
+        | errno => reject "idris2 build error: \{show errno}"
+    log (fmt "Compiled %s" (path </> inigoIPkgPath))
 
 export
-buildDeps : Promise ()
-buildDeps =  
-  do
-    files <- fs_getFilesR depsDir
-    let ipkgs = filter (isSuffixOf ".ipkg") files
-    ignore $ all $ map buildIPkg ipkgs
+buildDeps : Bool -> Promise ()
+buildDeps dev = do
+    pkg <- currPackage
+    let allDeps = pkg.deps ++ if dev then pkg.devDeps else []
+    let depNames = map fst allDeps
+    ignore $ all $ map buildDep depNames
+  where
+    buildDep : List String -> Promise ()
+    buildDep dep = buildIPkg $ joinPath dep
+
+export
+buildExtraDeps : Promise ()
+buildExtraDeps = do
+    pkgs <- readDepCache
+    traverse_ buildPkg pkgs -- TODO: topological ordering
+  where
+    buildPkg : (String, Package) -> Promise ()
+    buildPkg (src, _) = buildIPkg src
