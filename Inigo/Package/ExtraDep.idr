@@ -43,6 +43,12 @@ Eq ExtraDep where
     _ == _ = False
 
 export
+eqIgnoreSubDirs : ExtraDep -> ExtraDep -> Bool
+MkExtraDep Git commit0 url0 _ `eqIgnoreSubDirs` MkExtraDep Git commit1 url1 _ =
+    commit0 == commit1 && url0 == url1
+_ `eqIgnoreSubDirs` _ = False
+
+export
 toToml : List ExtraDep -> Toml
 toToml deps = [(["extra-dep"], ArrTab $ depToToml <$> deps)]
   where
@@ -61,6 +67,14 @@ parseExtraDeps toml = case get ["extra-dep"] toml of
     Just (ArrTab deps) => foldlM extraDep [] deps
     Just val => Left "Invalid extra dependency found: \{show val}"
   where
+    sanitiseCommit : String -> Either String String
+    sanitiseCommit str =
+        let len = length str
+            allHex = all isHexDigit $ unpack str
+        in if len == 7 || len == 40 && allHex
+            then Right str
+            else Left "Invalid commit: \"\{str}\""
+
     extraDep : List ExtraDep -> Toml -> Either String (List ExtraDep)
     extraDep deps toml = do
         url <- string ["url"] toml
@@ -68,14 +82,17 @@ parseExtraDeps toml = case get ["extra-dep"] toml of
         download <- parseDownload toml
         case download of
             Git => do
-                commit <- string ["commit"] toml
+                commit <- string ["commit"] toml >>= sanitiseCommit
                 pure $ MkExtraDep Git commit url subFolders :: deps
 
-export
 genFolder : String -> String
 genFolder = concat . map escapeChar . unpack
   where
     escapeChar : Char -> String
-    escapeChar c = if isAlphaNum c
+    escapeChar c = if isAlphaNum c || c == '@'
         then cast c
         else "_" ++ show (ord c)
+
+export
+getExtraDepDir : ExtraDep -> String
+getExtraDepDir (MkExtraDep Git commit url _) = genFolder "\{url}@\{commit}"
