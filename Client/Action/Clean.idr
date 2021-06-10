@@ -1,13 +1,13 @@
 module Client.Action.Clean
 
 import Client.Action.Build
-import Client.Action.BuildDeps
 import Data.List
 import Data.String
 import Inigo.Async.Base
 import Inigo.Async.Promise
 import Inigo.Async.FS
 import Inigo.Package.Package
+import Inigo.Paths
 
 cleanIPkg : String -> Promise ()
 cleanIPkg ipkg =
@@ -19,8 +19,8 @@ clean deps =
   do
     ignore writeIPkgFile
     ignore $ cleanIPkg iPkgFile
-    when (deps && !(fs_exists depsDir)) $
+    when (deps && !(fs_exists inigoDepDir)) $
       do
-        files <- fs_getFilesR depsDir
+        files <- fs_getFilesR inigoDepDir
         let ipkgs = filter (isSuffixOf ".ipkg") files
         ignore $ all $ map cleanIPkg ipkgs

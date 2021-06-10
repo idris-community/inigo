@@ -3,6 +3,7 @@ module Inigo.Async.Base
 import Data.Maybe
 import Inigo.Async.Promise
 import Inigo.Async.Util
+import Inigo.Paths
 
 %foreign (promisifyPrim "()=>new Promise((resolve,reject)=>{})")
 never__prim : promise ()
@@ -33,6 +34,10 @@ export
 log : String -> Promise ()
 log text =
   promisify (log__prim text)
+
+export
+debugLog : String -> Promise ()
+debugLog text = when DEBUG $ log text
 
 export
 system : String -> List String -> Maybe String -> Bool -> Bool -> Promise Int

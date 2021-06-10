@@ -4,7 +4,7 @@ import Data.List
 import Data.String
 import Extra.String
 import Inigo.Package.Package
-import System.Path
+import Inigo.Paths
 
 isIPkg : String -> Bool
 isIPkg =
@@ -16,7 +16,7 @@ isBuild =
 
 isDep : String -> Bool
 isDep =
-  isInfixOf "/Deps/"
+  isInfixOf inigoDepDir
 
 isDisallowed : String -> Bool
 isDisallowed x =
@@ -33,4 +33,4 @@ depPath pkg =
   let
     modPath = joinPath (split '.' (package pkg))
   in
-    "Deps" </> (ns pkg) </> modPath
+    inigoDepDir </> (ns pkg) </> modPath
