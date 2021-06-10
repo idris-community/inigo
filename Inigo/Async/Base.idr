@@ -13,10 +13,10 @@ reject__prim : String -> promise a
 %foreign (promisifyResolve "null" "(text)=>console.log(text)")
 log__prim : String -> promise ()
 
-%foreign (promisifyPrim (toArray "(cmd,args,workDir,detached,verbose)=>new Promise((resolve,reject)=>{let opts={detached:detached===1n, stdio: ['ignore', process.stdout, process.stderr],cwd:workDir};require('child_process').spawn(cmd, toArray(args), opts).on('close', (code) => resolve(code))})"))
+%foreign (promisifyPrim (toArray "(cmd,args,workDir,detached,verbose)=>new Promise((resolve,reject)=>{let opts={detached:detached===1n, stdio: ['ignore', process.stdout, process.stderr],cwd:workDir};require('child_process').spawn(cmd, toArray(args), opts).on('close', (code) => resolve(BigInt(code)))})"))
 system__prim : String -> List String -> String -> Int -> Int -> promise Int
 
-%foreign (promisifyPrim (toArray "(cmd,args,detached,verbose)=>new Promise((resolve,reject)=>{let opts={detached:detached===1n, stdio: 'inherit'};require('child_process').spawn(cmd, toArray(args), opts).on('close', (code) => resolve(code))})"))
+%foreign (promisifyPrim (toArray "(cmd,args,detached,verbose)=>new Promise((resolve,reject)=>{let opts={detached:detached===1n, stdio: 'inherit'};require('child_process').spawn(cmd, toArray(args), opts).on('close', (code) => resolve(BigInt(code)))})"))
 systemWithStdIO__prim : String -> List String -> Int -> Int -> promise Int
 
 export
