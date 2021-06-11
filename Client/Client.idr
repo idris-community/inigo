@@ -172,11 +172,7 @@ runAction (Extract archiveFile outPath) =
     run (extractArchive archiveFile outPath)
 
 runAction (BuildDeps dev) =
-  do
-    putStrLn "Building deps..."
-    run $ parallel
-        (buildDeps dev)
-        buildExtraDeps
+  run $ buildDeps dev
 
 runAction (Build codeGen) =
   run (build codeGen)
@@ -190,9 +186,7 @@ runAction (Exec codeGen userArgs) =
 runAction (FetchDeps server includeDevDeps build) =
   do
     putStrLn ("Feching deps from " ++ toString server ++ (if includeDevDeps then " including dev deps" else ""))
-    run $ parallel
-        (fetchDeps server includeDevDeps build)
-        (fetchExtraDeps includeDevDeps build)
+    run $ fetchAllDeps server includeDevDeps build
 
 runAction (Push server archive) =
   do
