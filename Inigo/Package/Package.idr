@@ -8,7 +8,10 @@ import Extra.String
 import Fmt
 import public Inigo.Package.ExtraDep
 import Inigo.Package.ParseHelpers
+import Inigo.Paths
+import Inigo.PkgTree
 import SemVar
+import System.Path
 import Toml
 
 public export
@@ -154,3 +157,20 @@ builddir = %s
 
 version = %s%s%s
 """ (package pkg) modules' depends' (quote pkg.sourcedir) (quote buildDir) (show $ version pkg) main executable
+
+export
+getDepsPackage : Bool -> Package -> List String
+getDepsPackage dev pkg =
+    let deps : List (List String, Requirement)
+        deps = (if dev then pkg.devDeps else []) ++ pkg.deps
+    in depsOnto pkg.extraDeps $ map (joinPath . Builtin.fst) deps
+    where
+    depsOnto : List ExtraDep -> List String -> List String
+    depsOnto [] deps = deps
+    depsOnto (ed :: eds) deps =
+        let dir = getExtraDepDir ed
+        in depsOnto eds $ map (dir </>) ed.subDirs ++ deps
+
+export
+HasDeps Package String where
+    getDeps = getDepsPackage
