@@ -53,11 +53,9 @@ collect includeDevDeps depTree =
 -- We're going to grab all sub-dep trees via our new deps endpoint
 -- and then we're going to cull dups and then pass it to semvar sat to try
 -- and return us what deps we should fetch!
-export
-fetchDeps : Server -> Bool -> Bool -> Promise ()
-fetchDeps server includeDevDeps build =
+fetchDeps : Server -> Bool -> Bool -> Package -> Promise (List (String, Package))
+fetchDeps server includeDevDeps build pkg =
   do
-    pkg <- Inigo.Async.Package.currPackage
     -- We have a list of deps, so we basically just need to `pull` each
     -- but we need to know the versions...
     -- Let's start by just pulling the latest of each
@@ -72,14 +70,14 @@ fetchDeps server includeDevDeps build =
       | Left err => reject ("Error satisfying contraints: " ++ err)
     log ("Sat: " ++ (show sat))
     
-    ignore $ all $ map pullDep sat
+    all $ map pullDep sat
     -- TODO: We should only build things which have changed
     -- TODO: How do we know what's changed?
     -- if build
     --   then buildDeps
     --   else pure ()
   where
-    pullDep : (List String, Version) -> Promise ()
+    pullDep : (List String, Version) -> Promise (String, Package)
     pullDep (pkg, version) =
       case splitDep pkg of
         Nothing =>
@@ -88,6 +86,10 @@ fetchDeps server includeDevDeps build =
         Just (packageNS, packageName) =>
           do
             pull server packageNS packageName (Just version)
+            let src = inigoDepDir </> joinPath pkg
+            pkg <- readPackage $ src </> inigoTomlPath
+            pure (src, pkg)
+
 
 ||| Get all elems of the left list not present in the right list
 total
@@ -95,17 +97,14 @@ difference : Eq a => List a -> List a -> List a
 difference xs [] = xs
 difference xs (y :: ys) = difference (delete y xs) ys
 
-export
-fetchExtraDeps : Bool -> Bool -> Promise ()
-fetchExtraDeps devDeps build = do
-    pkg <- currPackage
+fetchExtraDeps : Bool -> Bool -> Package -> Promise (List (String, Package))
+fetchExtraDeps devDeps build pkg = do
     deps <- fetchDeps [] pkg.extraDeps
-    pkgs <- foldlM getExtraDepPkg [] deps
-    writeDepCache pkgs
+    foldlM getExtraDepPkg [] deps
   where
     getSubDirPkg : String -> List (String, Package) -> String -> Promise (List (String, Package))
     getSubDirPkg depDir pkgs subDir = do
-        let srcDir = inigoDepDir </> depDir </> subDir
+        let srcDir = depDir </> subDir
         pkg <- readPackage $ srcDir </> inigoTomlPath
         if any ((== pkg) . snd) pkgs
             then pure pkgs
@@ -126,7 +125,7 @@ fetchExtraDeps devDeps build = do
 
     fetchExtraDep : ExtraDep -> Promise (List Package)
     fetchExtraDep pkg@(MkExtraDep Git commit url subDirs) = do
-        let dest = inigoDepDir </> getExtraDepDir pkg
+        let dest = getExtraDepDir pkg
         log "Downloading package from \"\{url}\""
         ignore $ git_downloadTo url (Just commit) dest
         traverse (genIPkg dest) subDirs
@@ -142,8 +141,17 @@ fetchExtraDeps devDeps build = do
         Just pkg@(MkExtraDep Git commit url subDirs1) => case difference subDirs0 subDirs1 of
             [] => fetchDeps done todo -- no missing subdirs, move on
             missing => do
-                let dest = inigoDepDir </> getExtraDepDir pkg
+                let dest = getExtraDepDir pkg
                 pkgs <- traverse (genIPkg dest) missing
                 let todo' = foldl (\acc, pkg => pkg.extraDeps ++ acc) todo pkgs
                 let done' = MkExtraDep Git commit url (missing ++ subDirs0) :: filter (not . eqIgnoreSubDirs pkg) done
                 fetchDeps done' todo
+
+export
+fetchAllDeps : Server -> Bool -> Bool -> Promise ()
+fetchAllDeps server devDeps build = do
+    pkg <- currPackage
+    deps <- fetchDeps server devDeps build pkg
+    extraDeps <- fetchExtraDeps devDeps build pkg
+    let allDeps = deps ++ extraDeps
+    writeDepCache allDeps
