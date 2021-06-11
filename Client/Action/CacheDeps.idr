@@ -12,7 +12,9 @@ import SemVar
 
 export
 writeDepCache : List (String, Package) -> Promise ()
-writeDepCache pkgWithSrcs = fs_writeFile inigoDepPkgCache json
+writeDepCache pkgWithSrcs = do
+    fs_mkdir True inigoDepDir
+    fs_writeFile inigoDepPkgCache json
   where
     encodeWithSrc : (String, Package) -> JSON
     encodeWithSrc (src, pkg) = JObject
