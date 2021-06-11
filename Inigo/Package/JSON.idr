@@ -14,6 +14,11 @@ extraDepToJSON (MkExtraDep Git commit url subDirs) = JObject
     , ("url", JString url)
     , ("subDirs", JArray (JString <$> subDirs))
     ]
+extraDepToJSON (MkExtraDep SubDir _ url subDirs) = JObject
+    [ ("download", JString "folder")
+    , ("url", JString url)
+    , ("subDirs", JArray (JString <$> subDirs))
+    ]
 
 nullable : Lazy (a -> JSON) -> Maybe a -> JSON
 nullable = maybe JNull
@@ -81,6 +86,7 @@ namespace Parse
             "git" => do
                 commit <- stringKey "commit" json
                 Just $ MkExtraDep Git commit url subDirs
+            "sub-folder" => Just $ MkExtraDep SubDir () url subDirs
             _ => Nothing
 
     export

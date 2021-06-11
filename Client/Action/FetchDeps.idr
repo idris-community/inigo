@@ -117,8 +117,8 @@ fetchExtraDeps devDeps build pkg = do
     genIPkg : String -> String -> Promise Package
     genIPkg dest subDir = do
         let buildDir = joinPath (".." <$ splitPath (dest </> subDir)) </> "build"
-        let toml = dest </> subDir </> "Inigo.toml"
-        let iPkgFile = dest </> subDir </> "Inigo.ipkg"
+        let toml = dest </> subDir </> inigoTomlPath
+        let iPkgFile = dest </> subDir </> inigoIPkgPath
         pkg <- readPackage toml
         fs_writeFile iPkgFile $ generateIPkg (Just buildDir) pkg
         pure pkg
@@ -129,24 +129,27 @@ fetchExtraDeps devDeps build pkg = do
         log "Downloading package from \"\{url}\""
         ignore $ git_downloadTo url (Just commit) dest
         traverse (genIPkg dest) subDirs
+    fetchExtraDep pkg@(MkExtraDep SubDir _ url subDirs) = do
+        let dest = getExtraDepDir pkg
+        log "Checking packages in \"\{url}\""
+        traverse (genIPkg dest) subDirs
 
     fetchDeps : List ExtraDep -> List ExtraDep -> Promise (List ExtraDep) -- if this is too slow, use SortedSet
     fetchDeps done [] = pure done
     fetchDeps done (MkExtraDep _ _ _ [] :: todo) = fetchDeps done todo
-    fetchDeps done (pkg@(MkExtraDep Git commit url subDirs0) :: todo) = case find (eqIgnoreSubDirs pkg) done of
+    fetchDeps done (pkg@(MkExtraDep _ _ _ subDirs0) :: todo) = case find (eqIgnoreSubDirs pkg) done of
         Nothing => do -- doesn't exist yet, download and add dependencies
             pkgs <- fetchExtraDep pkg
             let todo' = foldl (\acc, pkg => pkg.extraDeps ++ acc) todo pkgs
             fetchDeps (pkg :: done) todo'
-        Just pkg@(MkExtraDep Git commit url subDirs1) => case difference subDirs0 subDirs1 of
+        Just pkg@(MkExtraDep method info url subDirs1) => case difference subDirs0 subDirs1 of
             [] => fetchDeps done todo -- no missing subdirs, move on
             missing => do
                 let dest = getExtraDepDir pkg
                 pkgs <- traverse (genIPkg dest) missing
                 let todo' = foldl (\acc, pkg => pkg.extraDeps ++ acc) todo pkgs
-                let done' = MkExtraDep Git commit url (missing ++ subDirs0) :: filter (not . eqIgnoreSubDirs pkg) done
+                let done' = MkExtraDep method info url (missing ++ subDirs0) :: filter (not . eqIgnoreSubDirs pkg) done
                 fetchDeps done' todo
-
 export
 fetchAllDeps : Server -> Bool -> Bool -> Promise ()
 fetchAllDeps server devDeps build = do
