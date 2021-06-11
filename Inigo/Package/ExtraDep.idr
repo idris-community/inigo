@@ -4,6 +4,8 @@ import Data.List1
 import Data.String
 import Extra.String
 import Inigo.Package.ParseHelpers
+import Inigo.Paths
+import System.Path
 import Toml
 
 -- TODO: Other methods?
@@ -29,17 +31,17 @@ record ExtraDep where
     download : Download
     downloadInfo : DownloadInfo download
     url : String
-    subFolders : List String
+    subDirs : List String
 
 export
 Show ExtraDep where
-    show (MkExtraDep Git commit url subFolders) =
-        "MkExtraDep{download=git, download-info=\"\{commit}\", url=\"\{url}\", subFolders=\{show subFolders}"
+    show (MkExtraDep Git commit url subDirs) =
+        "MkExtraDep{download=git, download-info=\"\{commit}\", url=\"\{url}\", subDirs=\{show subDirs}"
 
 export
 Eq ExtraDep where
-    MkExtraDep Git commit0 url0 subFolders0 == MkExtraDep Git commit1 url1 subFolders1 =
-        commit0 == commit1 && url0 == url1 && subFolders0 == subFolders1
+    MkExtraDep Git commit0 url0 subDirs0 == MkExtraDep Git commit1 url1 subDirs1 =
+        commit0 == commit1 && url0 == url1 && subDirs0 == subDirs1
     _ == _ = False
 
 export
@@ -53,11 +55,11 @@ toToml : List ExtraDep -> Toml
 toToml deps = [(["extra-dep"], ArrTab $ depToToml <$> deps)]
   where
     depToToml : ExtraDep -> Toml
-    depToToml (MkExtraDep Git commit url subFolders) =
+    depToToml (MkExtraDep Git commit url subDirs) =
         [ (["download"], Str "git")
         , (["commit"], Str commit)
         , (["url"], Str url)
-        , (["sub-folders"], Lst (Str <$> subFolders))
+        , (["sub-folders"], Lst (Str <$> subDirs))
         ]
 
 export
@@ -78,12 +80,12 @@ parseExtraDeps toml = case get ["extra-dep"] toml of
     extraDep : List ExtraDep -> Toml -> Either String (List ExtraDep)
     extraDep deps toml = do
         url <- string ["url"] toml
-        subFolders <- withDefault [""] $ listStr ["sub-folders"] toml
+        subDirs <- withDefault [""] $ listStr ["sub-folders"] toml
         download <- parseDownload toml
         case download of
             Git => do
                 commit <- string ["commit"] toml >>= sanitiseCommit
-                pure $ MkExtraDep Git commit url subFolders :: deps
+                pure $ MkExtraDep Git commit url subDirs :: deps
 
 genFolder : String -> String
 genFolder = concat . map escapeChar . unpack
@@ -95,4 +97,4 @@ genFolder = concat . map escapeChar . unpack
 
 export
 getExtraDepDir : ExtraDep -> String
-getExtraDepDir (MkExtraDep Git commit url _) = genFolder "\{url}@\{commit}"
+getExtraDepDir (MkExtraDep Git commit url _) = inigoDepDir </> genFolder "\{url}@\{commit}"
