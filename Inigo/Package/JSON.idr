@@ -86,7 +86,7 @@ namespace Parse
             "git" => do
                 commit <- stringKey "commit" json
                 Just $ MkExtraDep Git commit url subDirs
-            "sub-folder" => Just $ MkExtraDep SubDir () url subDirs
+            "folder" => Just $ MkExtraDep SubDir () url subDirs
             _ => Nothing
 
     export
