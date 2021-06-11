@@ -2,14 +2,16 @@ module Client.Action.BuildDeps
 
 import Client.Action.CacheDeps
 import Data.List
+import Data.SortedMap as Map
+import Data.SortedSet as Set
 import Data.String
 import Fmt
 import Inigo.Async.Base
-import Inigo.Async.FS
 import Inigo.Async.Package
 import Inigo.Async.Promise
 import Inigo.Package.Package
 import Inigo.Paths
+import Inigo.PkgTree
 import SemVar
 
 buildIPkg : String -> Promise ()
@@ -24,19 +26,11 @@ buildIPkg path =
 export
 buildDeps : Bool -> Promise ()
 buildDeps dev = do
-    pkg <- currPackage
-    let allDeps = pkg.deps ++ if dev then pkg.devDeps else []
-    let depNames = map fst allDeps
-    ignore $ all $ map buildDep depNames
-  where
-    buildDep : List String -> Promise ()
-    buildDep dep = buildIPkg $ joinPath dep
-
-export
-buildExtraDeps : Promise ()
-buildExtraDeps = do
     pkgs <- readDepCache
-    traverse_ buildPkg pkgs -- TODO: topological ordering
-  where
-    buildPkg : (String, Package) -> Promise ()
-    buildPkg (src, _) = buildIPkg src
+    pkg <- currPackage
+    let ctxt = fromList pkgs
+    log $ "Generating build order" ++ if dev then " with dev dependencies" else ""
+    debugLog "Packages to build: \{show $ Set.toList $ keySet ctxt}"
+    debugLog "Package context: \{show $ Map.toList $ getDeps {name=String} dev <$> ctxt}"
+    build <- liftEither $ getBuildOrder dev ctxt (keySet ctxt)
+    traverse_ buildIPkg build
