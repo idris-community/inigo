@@ -78,15 +78,13 @@ mutual
   list =
     do
       ignore $ match LeftBracket
-      optWhitespace
       values <- sepBy (optSpacing $ match Comma) value
-      optWhitespace
       ignore $ match RightBracket
       pure (Lst values)
 
   value : Grammar TomlToken True Value
   value =
-    str <|> num <|> list
+    optSpacing $ str <|> num <|> list
 
 kv : Grammar TomlToken True (Maybe (List String, Value))
 kv =
