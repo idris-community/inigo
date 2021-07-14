@@ -11,7 +11,7 @@ dec64__prim : String -> PrimIO Buffer
 %foreign "node:lambda:(str)=>Buffer.from(str, 'utf-8')"
 fromString__prim : String -> PrimIO Buffer
 
-%foreign "node:lambda:(buf,char)=>BigInt(buf.indexOf(char))"
+%foreign "node:lambda:(buf,char)=>buf.indexOf(char)"
 indexOf__prim : Buffer -> Char -> PrimIO Int
 
 export

@@ -18,19 +18,19 @@ fs_writeFile__prim : String -> String -> promise ()
 %foreign (promisifyPrim "(path,contents)=>require('fs').promises.writeFile(path,contents)")
 fs_writeFileBuf__prim : String -> Buffer -> promise ()
 
-%foreign (promisifyPrim "(path,r)=>require('fs').promises.mkdir(path,{recursive: r === 1n})")
+%foreign (promisifyPrim "(path,r)=>require('fs').promises.mkdir(path,{recursive: r === 1})")
 fs_mkdir__prim : String -> Int -> promise ()
 
-%foreign (promisifyPrim "(path,r)=>require('fs').promises.rmdir(path,{recursive: r === 1n})")
+%foreign (promisifyPrim "(path,r)=>require('fs').promises.rmdir(path,{recursive: r === 1})")
 fs_rmdir__prim : String -> Int -> promise ()
 
 %foreign (promisifyPrim "(path)=>require('fs').promises.readdir(path).then(__prim_js2idris_array)")
 fs_getFiles__prim : String -> promise (List String)
 
-%foreign (promisifyPrim "(path)=>require('fs').promises.stat(path).then((s)=>s.isDirectory() ? 1n : 0n)")
+%foreign (promisifyPrim "(path)=>require('fs').promises.stat(path).then((s)=>s.isDirectory() ? 1 : 0)")
 fs_isDir__prim : String -> promise Int
 
-%foreign (promisifyPrim "(path)=>require('fs').promises.access(path).then(()=>1n).catch(()=>0n)")
+%foreign (promisifyPrim "(path)=>require('fs').promises.access(path).then(()=>1).catch(()=>0)")
 fs_exists__prim : String -> promise Int
 
 export

@@ -18,7 +18,7 @@ html content =
   (200, content, [("Content-Type", "text/html")])
 
 -- Could maybe make use of `__prim_js2idris_array`
-%foreign "javascript:lambda:(status,body,headers)=>{let toArray=((list)=>Object.fromEntries([...Array(list.h).keys()].map((i)=>{let x=list['a'+(i+1)];return [x.a1,x.a2]})));return new Response(body, {status: Number(status), headers: toArray(headers)});}"
+%foreign "javascript:lambda:(status,body,headers)=>{let toArray=((list)=>Object.fromEntries([...Array(list.h).keys()].map((i)=>{let x=list['a'+(i+1)];return [x.a1,x.a2]})));return new Response(body, {status: status, headers: toArray(headers)});}"
 prim__response : Int -> String -> List (String, String) -> PrimIO ()
 
 -- Note: can't use "Buffer" body here, needs to be an ArrayBuffer

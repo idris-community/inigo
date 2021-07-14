@@ -105,7 +105,7 @@ arrayBufferEnc64 str = "(function(){let arrayBufferEnc64=(buf)=>{let string = ''
 arrayBufferDec64 : String -> String
 arrayBufferDec64 str = "(function(){let arrayBufferDec64=(string)=>{string = atob(string); const length = string.length, buf = new ArrayBuffer(length), bufView = new Uint8Array(buf); for (var i = 0; i < length; i++) { bufView[i] = string.charCodeAt(i) } return buf;};return " ++ str ++ "})()"
 
-%foreign "node:lambda:" ++ (arrayBufferDec64 "(name, hash, salt, iterations) => ({name, hash, salt: salt ? arrayBufferDec64(salt) : null, iterations: iterations ? Number(iterations) : null})")
+%foreign "node:lambda:" ++ (arrayBufferDec64 "(name, hash, salt, iterations) => ({name, hash, salt: salt ? arrayBufferDec64(salt) : null, iterations: iterations ? iterations : null})")
 encodeAlgorithm__prim : String -> String -> String -> Int -> PrimIO AnyPtr
 
 %foreign "node:lambda:(name, namedCurve) => ({name, namedCurve})"
@@ -123,10 +123,10 @@ generateKey__prim : AnyPtr -> List String -> promise (List AnyPtr)
 %foreign (promisifyPrim (arrayBufferEnc64 "(algo, key, data) => crypto.subtle.sign(algo, key, new TextEncoder().encode(data)).then(arrayBufferEnc64)"))
 sign__prim : AnyPtr -> AnyPtr -> String -> promise String
 
-%foreign (promisifyPrim (arrayBufferDec64 "(algo, key, signature, data) => crypto.subtle.verify(algo, key, arrayBufferDec64(signature), new TextEncoder().encode(data)).then((res) => res ? 1n : 0n)"))
+%foreign (promisifyPrim (arrayBufferDec64 "(algo, key, signature, data) => crypto.subtle.verify(algo, key, arrayBufferDec64(signature), new TextEncoder().encode(data)).then((res) => res ? 1 : 0)"))
 verify__prim : AnyPtr -> AnyPtr -> String -> String -> promise Int
 
-%foreign ("node:lambda:" ++ (arrayBufferEnc64 "(len) => arrayBufferEnc64(crypto.getRandomValues(new Uint8Array(Number(len))))"))
+%foreign ("node:lambda:" ++ (arrayBufferEnc64 "(len) => arrayBufferEnc64(crypto.getRandomValues(new Uint8Array(len)))"))
 getRand__prim : Int -> PrimIO String
 
 %foreign (promisifyPrim (inspect (arrayBufferEnc64 "(algo, password) => crypto.subtle.importKey('raw', new TextEncoder().encode(password), algo, false, ['deriveBits', 'deriveKey']).then((km) => crypto.subtle.deriveKey(algo, km, {name:'AES-CBC','length':256}, true, ['encrypt', 'decrypt']).then((k) => crypto.subtle.exportKey('raw', k).then(arrayBufferEnc64)))")))

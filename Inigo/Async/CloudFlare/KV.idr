@@ -9,7 +9,7 @@ read__prim : String -> String -> promise String
 %foreign (promisifyPrim "(ns,key,value)=>this[ns] ? this[ns].put(key,value) : Promise.reject('Unknown KV namespace ' + ns)")
 write__prim : String -> String -> String -> promise ()
 
-%foreign (promisifyPrim "(ns,key,value,expirationTtl)=>this[ns] ? this[ns].put(key,value,{expirationTtl: Number(expirationTtl)}) : Promise.reject('Unknown KV namespace ' + ns)")
+%foreign (promisifyPrim "(ns,key,value,expirationTtl)=>this[ns] ? this[ns].put(key,value,{expirationTtl: expirationTtl}) : Promise.reject('Unknown KV namespace ' + ns)")
 writeTTL__prim : String -> String -> String -> Int -> promise ()
 
 export
