@@ -19,15 +19,6 @@ DownloadInfo : Download -> Type
 DownloadInfo Git = String -- commit
 DownloadInfo SubDir = ()
 
-export
-parseDownload : Toml -> Either String Download
-parseDownload toml = case get ["download"] toml of
-    Just (Str "git") => Right Git
-    Just (Str "folder") => Right SubDir
-    Just (Str val) => Left "Invalid download method: \{val}"
-    Just val => Left "Inavlid value for field download: \{show val}"
-    Nothing => Left "Missing field download"
-
 public export
 record ExtraDep where
     constructor MkExtraDep
@@ -39,9 +30,9 @@ record ExtraDep where
 export
 Show ExtraDep where
     show (MkExtraDep Git commit url subDirs) =
-        "MkExtraDep{download=git, download-info=\"\{commit}\", url=\"\{url}\", subDirs=\{show subDirs}"
+        "MkExtraDep{download=git, download-info=\"\{commit}\", url=\"\{url}\", subDirs=\{show subDirs}}"
     show (MkExtraDep SubDir () url subDirs) =
-        "MkExtraDep{download=folder, url=\"\{url}\", subDirs=\{show subDirs}"
+        "MkExtraDep{download=folder, url=\"\{url}\", subDirs=\{show subDirs}}"
 
 
 export
@@ -76,6 +67,16 @@ toToml deps = [(["extra-dep"], ArrTab $ depToToml <$> deps)]
         , (["url"], Str url)
         , (["sub-folders"], Lst (Str <$> subDirs))
         ]
+
+export
+parseDownload : Toml -> Either String Download
+parseDownload toml = case get ["download"] toml of
+    Just (Str "git") => Right Git
+    Just (Str "folder") => Right SubDir
+    Just (Str val) => Left "Invalid download method: \{val}"
+    Just val => Left "Inavlid value for field download: \{show val}"
+    Nothing => Left "Missing field download"
+
 
 export
 parseExtraDeps : Toml -> Either String (List ExtraDep)
