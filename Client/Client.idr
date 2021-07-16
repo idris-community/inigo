@@ -4,6 +4,7 @@ import Client.Action.Archive
 import Client.Action.Build
 import Client.Action.BuildDeps
 import Client.Action.Clean
+import Client.Action.Check
 import Client.Action.Exec
 import Client.Action.FetchDeps
 import Client.Action.Init
@@ -54,6 +55,7 @@ data Action : Type where
   Build : CodeGen -> Action
   BuildDeps : Bool -> Action
   Clean : Bool -> Action
+  Check : Action
   Exec : CodeGen -> List String -> Action
   Extract : String -> String -> Action
   FetchDeps : Server -> Bool -> Bool -> Action
@@ -96,6 +98,9 @@ getAction ["clean"] =
 
 getAction ["clean", "deps"] =
   Just (Clean True)
+
+getAction ["check"] =
+  Just Check
 
 getAction ("exec" :: args) =
   do
@@ -179,6 +184,9 @@ runAction (Build codeGen) =
 
 runAction (Clean deps) =
   run (clean deps)
+
+runAction Check =
+  run check
 
 runAction (Exec codeGen userArgs) =
   run (exec codeGen True userArgs) -- TODO: Make build a flag
