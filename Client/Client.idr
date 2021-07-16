@@ -234,40 +234,41 @@ runAction (Init packageNS packageName) =
 runAction (Test codeGen) =
   run (test codeGen)
 
-short : String -> Maybe String
-short "archive" = Just "archive <pkg_file> <out_file>: Archive a given package"
-short "build" = Just "build <code-gen=node>: Build program under given code gen"
-short "build-deps" = Just "build-deps: Build all deps"
-short "clean" = Just "clean <deps?>: Clean package artifacts, optionally including deps"
-short "exec" = Just "exec <code-gen=node> -- ...args: Execute program with given args"
-short "extract" = Just "extract <archive_file> <out_path>: Extract a given archive to directory"
-short "fetch-deps" = Just "fetch-deps <server>: Fetch and build all deps (opts: --no-build, --dev)"
-short "init" = Just "init <namespace> <package>: Initialize a new project with given namespace and package name"
-short "login" = Just "login <server>: Login to an account"
-short "pull" = Just "pull <server> <package_ns> <package_name> <version?>: Pull a package from remote"
-short "push" = Just "push <server> <pkg_file>: Push a package to remote"
-short "register" = Just "register <server>: Register an account namespace"
-short "test" = Just "test: Run tests via IdrTest"
-short _ = Nothing
+short : Action -> String
+short (Archive _ _)     = "archive <pkg_file> <out_file>: Archive a given package"
+short (Build _)         = "build <code-gen=node>: Build program under given code gen"
+short (BuildDeps _)     = "build-deps: Build all deps"
+short (Clean _)         = "clean <deps?>: Clean package artifacts, optionally including deps"
+short Check             = "check: Typecheck the project"
+short (Exec _ _)        = "exec <code-gen=node> -- ...args: Execute program with given args"
+short (Extract _ _)     = "extract <archive_file> <out_path>: Extract a given archive to directory"
+short (FetchDeps _ _ _) = "fetch-deps <server>: Fetch and build all deps (opts: --no-build, --dev)"
+short (Init _ _)        = "init <namespace> <package>: Initialize a new project with given namespace and package name"
+short (Login _)         = "login <server>: Login to an account"
+short (Pull _ _ _ _)    = "pull <server> <package_ns> <package_name> <version?>: Pull a package from remote"
+short (Push _ _)        = "push <server> <pkg_file>: Push a package to remote"
+short (Register _)      = "register <server>: Register an account namespace"
+short (Test _)          = "test: Run tests via IdrTest"
 
 usage : IO ()
 usage =
   let
-    descs = join "\n\t" $ mapMaybe id $
+    descs = join "\n\t" $
       map short
-        [ "archive"
-        , "build"
-        , "build-deps"
-        , "clean"
-        , "exec"
-        , "extract"
-        , "fetch-deps"
-        , "init"
-        , "login"
-        , "pull"
-        , "push"
-        , "register"
-        , "test"
+        [ (Archive "" "")
+        , (Build Node)
+        , (BuildDeps False)
+        , (Clean False)
+        , Check
+        , (Exec Node [])
+        , (Extract "" "")
+        , (FetchDeps Prod False False)
+        , (Init "" "")
+        , (Login Prod)
+        , (Pull Prod "" "" Nothing)
+        , (Push Prod "")
+        , (Register Prod)
+        , (Test Node)
         ]
   in
     fail ("usage: Inigo <command> <...args>\n\n\t" ++ descs)

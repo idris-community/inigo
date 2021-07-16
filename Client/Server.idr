@@ -4,7 +4,7 @@ import Inigo.Package.Package
 import Extra.String
 import SemVar
 
-export
+public export
 data Server : Type where
   Dev : Server
   Prod : Server
