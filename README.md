@@ -7,7 +7,7 @@ Note: this project is in an **alpha test state**. Expect breaking changes at thi
 
 ## Installation
 
-First, you'll need to install `inigo`. Note: we currently only support JavaScript code-gen on the client, but we plan to add support to Chez and other code-gens soon.
+First, you'll need to install `inigo`. Note: we currently only support Idris2's built in code-gens on the client, but we plan to add support for external code-gens soon.
 
 You can either download a release from [releases](https://github.com/hayesgm/inigo/releases) or bootstrap your own.
 
