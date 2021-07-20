@@ -1,6 +1,7 @@
 *.DS_Store
 build
 Deps
+.inigo-work
 Base/*/build
 Base/*/Deps
 Server/InigoStatic/Local/*
@@ -11,3 +12,6 @@ Server/InigoStatic/Local/*
 !*Bootstrap.ipkg
 !Inigo.ipkg
 !Server/InigoServer/InigoServer.ipkg
+
+# editor
+.vscode
