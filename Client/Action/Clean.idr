@@ -18,7 +18,7 @@ clean : Bool -> Promise ()
 clean deps =
   do
     ignore writeIPkgFile
-    ignore $ cleanIPkg iPkgFile
+    ignore $ cleanIPkg inigoIPkgPath
     when (deps && !(fs_exists inigoDepDir)) $
       do
         files <- fs_getFilesR inigoDepDir
