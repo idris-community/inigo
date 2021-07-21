@@ -19,7 +19,7 @@ exec : CodeGen -> Bool -> List String -> Promise ()
 exec codeGen build userArgs =
   do
     pkg <- Client.Action.Build.writeIPkgFile
-    if build then (runBuild codeGen pkg) else pure ()
+    when build $ runBuild codeGen
     let Just e = executable pkg
       | Nothing => reject "No executable set in Inigo config"
     let (cmd, args) = CodeGen.cmdArgs codeGen (execDir </> e)

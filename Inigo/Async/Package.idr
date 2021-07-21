@@ -6,9 +6,7 @@ import Inigo.Async.FS
 import Inigo.Async.Promise
 import Inigo.Package.Package
 import Inigo.Package.PackageIndex
-
-currConfFile : String
-currConfFile = "./Inigo.toml"
+import Inigo.Paths
 
 ||| Gets a package from the "packages" KV
 export
@@ -35,7 +33,7 @@ export
 currPackage : Promise Package
 currPackage =
   do
-    contents <- fs_readFile currConfFile
+    contents <- fs_readFile inigoTomlPath
     let Right package = parsePackage contents
       | Left err => reject ("Error reading package: " ++ err)
     pure package
