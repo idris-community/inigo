@@ -1,4 +1,6 @@
 
+![build](https://github.com/idris-community/inigo/actions/workflows/ci.yml/badge.svg)
+
 # Inigo
 
 Inigo is a package manager for Idris2 to help use and share Idris code.
@@ -144,7 +146,7 @@ inigo push ./Inigo.toml
 
 ## Questions
 
-Feel free to ask questions on [GitHub issues](https://github.com/hayesgm/inigo/issues).
+Feel free to ask questions on [GitHub issues](https://github.com/idris-community/inigo/issues).
 
 ## Contributing
 
