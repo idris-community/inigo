@@ -12,6 +12,7 @@ import Client.Action.Login
 import Client.Action.Pull
 import Client.Action.Push
 import Client.Action.Register
+import Client.Action.Repl
 import Client.Action.Test
 import Client.Server
 import Client.Skeleton.Skeleton
@@ -64,6 +65,7 @@ data Action : Type where
   Pull : Server -> String -> String -> (Maybe Version) -> Action
   Push : Server -> String -> Action
   Register : Server -> Action
+  Repl : Action
   Test : CodeGen -> Action
 
 fetchDepsAction : String -> Bool -> Bool -> Maybe Action
@@ -144,12 +146,15 @@ getAction ["test", codeGen] =
     pure $ Test codeGen
 
 getAction ["test"] =
-  Just (Test Node)
+  pure $ Test Node
 
 getAction ["register", serverName] =
   do
     server <- getServer serverName
     pure $ Register server
+
+getAction ["repl"] =
+    pure Repl
 
 getAction ["login", serverName] =
   do
@@ -217,6 +222,8 @@ runAction (Register server) =
     putStrLn (fmt "Creating account %s..." ns)
     run (registerAccount server ns email passphrase)
 
+runAction Repl = run repl
+
 runAction (Login server) =
   do
     putStrLn "Welcome back to Inigo."
@@ -248,6 +255,7 @@ short (Login _)         = "login <server>: Login to an account"
 short (Pull _ _ _ _)    = "pull <server> <package_ns> <package_name> <version?>: Pull a package from remote"
 short (Push _ _)        = "push <server> <pkg_file>: Push a package to remote"
 short (Register _)      = "register <server>: Register an account namespace"
+short Repl              = "repl: Launch idris2 repl"
 short (Test _)          = "test: Run tests via IdrTest"
 
 usage : IO ()
@@ -268,6 +276,7 @@ usage =
         , (Pull Prod "" "" Nothing)
         , (Push Prod "")
         , (Register Prod)
+        , Repl
         , (Test Node)
         ]
   in
