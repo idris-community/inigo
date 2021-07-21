@@ -1,4 +1,6 @@
 
+![build](https://github.com/idris-community/inigo/actions/workflows/ci.yml/badge.svg)
+
 # Inigo
 
 Inigo is a package manager for Idris2 to help use and share Idris code.
@@ -13,13 +15,23 @@ You can either download a release from [releases](https://github.com/hayesgm/ini
 
 ### Downloading a Release
 
-Download a release from the [releases](https://github.com/hayesgm/inigo/releases) page. Install the file into your path and make sure it's executable.
+We don't currently have any releases, but we may add them soon!
+
+<!--
+Download a release from the [releases](https://github.com/idris-community/inigo/releases) page. Install the file into your path and make sure it's executable.
 
 ```bash
-curl -L https://github.com/hayesgm/inigo/releases/download/0.0.1-alpha/inigo -o /usr/local/bin/inigo && chmod +x /usr/local/bin/inigo
+curl -L https://github.com/idris-community/inigo/releases/download/0.0.1-alpha/inigo -o /usr/local/bin/inigo && chmod +x /usr/local/bin/inigo
 ```
+-->
 
 ### Bootstrapping
+
+#### Dependencies
+- [idris2](https://github.com/idris-lang/Idris2)
+- [idris2api](https://github.com/idris-lang/Idris2/blob/master/INSTALL.md#7-optional-installing-the-idris-2-api)
+
+#### Building and installing
 
 You can run the bootstrap Makefile command on Linux-type environments to bootstrap Inigo. Since Inigo depends on packages in Inigo, you'll need to bootstrap to get the components you need.
 
@@ -39,6 +51,12 @@ or simply:
 
 ```bash
 make install
+```
+
+You can specify the install location by setting `INSTALL_DIR` in `config.mk` or on the command line
+
+```bash
+make install INSTALL_DIR="/usr/local/bin/
 ```
 
 ## Create an app
@@ -128,7 +146,7 @@ inigo push ./Inigo.toml
 
 ## Questions
 
-Feel free to ask questions on [GitHub issues](https://github.com/hayesgm/inigo/issues).
+Feel free to ask questions on [GitHub issues](https://github.com/idris-community/inigo/issues).
 
 ## Contributing
 
