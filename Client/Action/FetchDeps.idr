@@ -120,7 +120,7 @@ fetchExtraDeps devDeps build pkg = do
         let toml = dest </> subDir </> inigoTomlPath
         let iPkgFile = dest </> subDir </> inigoIPkgPath
         pkg <- readPackage toml
-        fs_writeFile iPkgFile $ generateIPkg (Just buildDir) pkg
+        fs_writeFile iPkgFile $ generateIPkg False (Just buildDir) pkg
         pure pkg
 
     fetchExtraDep : ExtraDep -> Promise (List Package)

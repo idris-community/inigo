@@ -137,11 +137,13 @@ whenCons _ x = x
 
 -- ||| Generates an ipkg for compatibility with the native idris build system
 export
-generateIPkg : Maybe String -> Package -> String
-generateIPkg depBuildDir pkg =
+generateIPkg : (includeExe : Bool) -> Maybe String -> Package -> String
+generateIPkg exe depBuildDir pkg =
   let
-    main = fromMaybe "" $ map ((++) "\nmain = ") (main pkg)
-    executable = fromMaybe "" $ map ((++) "\nexecutable = ") (executable pkg)
+    main = fromMaybe "" $ map ("\nmain = " ++) (main pkg)
+    executable = if exe
+        then fromMaybe "" $ map ("\nexecutable = " ++) (executable pkg)
+        else ""
     modules' = whenCons pkg.modules $ fmt "modules = %s " $ join ", " (modules pkg)
     depends' = whenCons pkg.depends $ fmt "depends = %s " $ join ", " (depends pkg)
     buildDir = fromMaybe "build" depBuildDir

@@ -48,4 +48,4 @@ pull server packageNS packageName maybeVersion =
     extractArchive archive depPath
     let iPkgFile = depPath </> "Inigo.ipkg"
     log (fmt "Writing %s..." iPkgFile)
-    fs_writeFile iPkgFile (Package.Package.generateIPkg (Just "../../../../build") pkg)
+    fs_writeFile iPkgFile (Package.Package.generateIPkg False (Just "../../../../build") pkg)
